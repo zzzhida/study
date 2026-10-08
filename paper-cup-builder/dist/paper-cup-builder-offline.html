@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>纸杯搭建台</title>
+<title>Paper Cup Builder</title>
 <style>
 /* Layout: a workbench — tool rail and live 3D stage on the left, the three drafting views (and the real photos) pinned on the right. Classroom palette: grey desk, blue chair, paper-cup ivory, black straw. */
 :root {
@@ -87,6 +87,7 @@ select, .btn { font: inherit; font-size: 14px; border: 1px solid var(--line); ba
 details.code { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
 details.code summary { cursor: pointer; font-weight: 500; }
 details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; resize: vertical; }
+.btn.lang { margin-left: 4px; }
 .undo-tip { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
 .undo-tip b { color: var(--ink, inherit); }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
@@ -98,87 +99,88 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
 
 <div class="wrap">
   <header>
-    <h1>纸杯搭建台</h1>
-    <p class="sub">载入两轮活动二的目标结构，或者自己搭一个新的。点桌面放杯，点杯顶叠层；拖动旋转视角。右侧三视图随时更新，可以直接拿来出题。</p>
+    <h1 data-i18n="title">Paper Cup Builder</h1>
+    <p class="sub" data-i18n="sub">Load a target structure from either round of Activity 2, or build your own. Click the table to place a cup, click the top of a cup to stack; drag to orbit. The three views on the right update live and can be used directly as puzzle cards.</p>
   </header>
 
   <div class="bar">
-    <select id="preset" aria-label="选择结构"></select>
-    <button class="btn" id="btn-new">新建空白</button>
-    <button class="btn" id="btn-undo" disabled>撤销</button>
+    <select id="preset" aria-label="Choose a structure" data-i18n-aria="aria.preset"></select>
+    <button class="btn" id="btn-new" data-i18n="new">New blank</button>
+    <button class="btn" id="btn-undo" disabled data-i18n="undo">Undo</button>
     <span class="count" id="count"></span>
+    <button class="btn lang" id="btn-lang" lang="zh-CN" aria-label="Switch language" data-i18n-aria="aria.lang">中文</button>
   </div>
 
   <div class="bench">
-    <section class="panel" aria-label="搭建区">
+    <section class="panel" aria-label="Build area" data-i18n-aria="aria.build">
       <div class="stage" id="stage">
-        <div class="fallback" id="fallback" hidden>3D 画面加载失败，请检查网络后刷新。</div>
+        <div class="fallback" id="fallback" hidden data-i18n="fallback">The 3D view failed to load. Check your connection and refresh.</div>
         <div class="toast" id="toast" role="status"></div>
-        <span class="hint">左键放置 · 右键拿走 · 拖动旋转 · 滚轮缩放</span>
+        <span class="hint" data-i18n="hint">Left-click place · Right-click remove · Drag orbit · Wheel zoom</span>
       </div>
       <div class="tools">
-        <div class="row" role="group" aria-label="工具">
-          <span class="lab">工具</span>
-          <button class="seg" data-tool="up" id="t-up">正放 <kbd>1</kbd></button>
-          <button class="seg" data-tool="down" id="t-down">倒扣 <kbd>2</kbd></button>
-          <button class="seg" data-tool="side" id="t-side">侧放 <kbd>3</kbd></button>
-          <button class="seg" data-tool="straw" id="t-straw">吸管 <kbd>4</kbd></button>
-          <button class="seg" data-tool="erase" id="t-erase">拿走 <kbd>5</kbd></button>
+        <div class="row" role="group" aria-label="Tools" data-i18n-aria="aria.tools">
+          <span class="lab" data-i18n="lab.tool">Tool</span>
+          <button class="seg" data-tool="up" id="t-up"><span data-i18n="tool.up">Upright</span> <kbd>1</kbd></button>
+          <button class="seg" data-tool="down" id="t-down"><span data-i18n="tool.down">Inverted</span> <kbd>2</kbd></button>
+          <button class="seg" data-tool="side" id="t-side"><span data-i18n="tool.side">On its side</span> <kbd>3</kbd></button>
+          <button class="seg" data-tool="straw" id="t-straw"><span data-i18n="tool.straw">Straw</span> <kbd>4</kbd></button>
+          <button class="seg" data-tool="erase" id="t-erase"><span data-i18n="tool.erase">Remove</span> <kbd>5</kbd></button>
         </div>
-        <div class="row" role="group" aria-label="朝向" id="dirrow">
-          <span class="lab">朝向</span>
-          <button class="seg" data-dir="front" id="d-front">朝前</button>
-          <button class="seg" data-dir="back" id="d-back">朝后</button>
-          <button class="seg" data-dir="left" id="d-left">朝左</button>
-          <button class="seg" data-dir="right" id="d-right">朝右</button>
-          <span class="lab" style="min-width:auto">R 键轮换</span>
+        <div class="row" role="group" aria-label="Direction" data-i18n-aria="aria.dir" id="dirrow">
+          <span class="lab" data-i18n="lab.dir">Facing</span>
+          <button class="seg" data-dir="front" id="d-front" data-i18n="dir.front">Front</button>
+          <button class="seg" data-dir="back" id="d-back" data-i18n="dir.back">Back</button>
+          <button class="seg" data-dir="left" id="d-left" data-i18n="dir.left">Left</button>
+          <button class="seg" data-dir="right" id="d-right" data-i18n="dir.right">Right</button>
+          <span class="lab" style="min-width:auto" data-i18n="dir.cycle">R to cycle</span>
         </div>
-        <div class="row" role="group" aria-label="吸管角度" id="tiltrow">
-          <span class="lab">吸管</span>
-          <button class="seg" data-stype="bent" id="s-bent">90°折弯</button>
-          <button class="seg" data-stype="up" id="s-up">直插·头朝上</button>
-          <button class="seg" data-stype="down" id="s-down">直插·头朝下</button>
+        <div class="row" role="group" aria-label="Straw type" data-i18n-aria="aria.straw" id="tiltrow">
+          <span class="lab" data-i18n="lab.straw">Straw</span>
+          <button class="seg" data-stype="bent" id="s-bent" data-i18n="st.bent">Bent 90°</button>
+          <button class="seg" data-stype="up" id="s-up" data-i18n="st.up">Straight · head up</button>
+          <button class="seg" data-stype="down" id="s-down" data-i18n="st.down">Straight · head down</button>
           <span class="lab" style="min-width:auto" id="stype-hint"></span>
         </div>
-        <p class="undo-tip">放错了？点上方「撤销」或按 Ctrl+Z 退回上一步。要拔吸管、拿走杯：选「拿走」工具点它，或直接<b>右键</b>点它，一次拿掉一样（先拔吸管，再拿最上层的杯）。</p>
-        <div class="legend"><span><i style="background:#b4d0f0"></i>正放</span><span><i style="background:#f5cfa6"></i>倒扣</span><span><i style="background:#bfe3c9"></i>侧放</span><span>（颜色可在右上切换为原色）</span></div>
+        <p class="undo-tip" data-i18n-html="undotip">Made a mistake? Click “Undo” above or press Ctrl+Z to step back. To pull a straw or take a cup away, pick the “Remove” tool and click it, or simply <b>right-click</b> it. One thing goes per click: straws first, then the top cup.</p>
+        <div class="legend"><span><i style="background:#b4d0f0"></i><span data-i18n="tool.up">Upright</span></span><span><i style="background:#f5cfa6"></i><span data-i18n="tool.down">Inverted</span></span><span><i style="background:#bfe3c9"></i><span data-i18n="tool.side">On its side</span></span><span data-i18n="lg.note">(switch to plain paper colour at the top right)</span></div>
       </div>
     </section>
 
     <div class="side">
-      <section class="panel views" aria-label="三视图">
+      <section class="panel views" aria-label="Three views" data-i18n-aria="aria.views">
         <div class="row" style="justify-content:space-between">
-          <h2>三视图（正交投影）</h2>
-          <label class="lab" for="tint" style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="tint" checked> 按朝向上色</label>
+          <h2 data-i18n="views">Three views (orthographic)</h2>
+          <label class="lab" for="tint" style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="tint" checked> <span data-i18n="tint">Colour by orientation</span></label>
         </div>
         <div class="vgrid">
-          <div class="vcell"><canvas id="mv-front" width="480" height="360" aria-label="正视图"></canvas><span>正视</span></div>
-          <div class="vcell"><canvas id="mv-side" width="480" height="360" aria-label="侧视图"></canvas><span><span id="side-label">侧视（从右看）</span><button id="flip-side">换另一侧</button></span></div>
-          <div class="vcell"><canvas id="mv-top" width="480" height="360" aria-label="俯视图"></canvas><span>俯视</span></div>
-          <div class="vcell"><canvas id="mv-iso" width="480" height="360" aria-label="斜视图"></canvas><span>斜视</span></div>
+          <div class="vcell"><canvas id="mv-front" width="480" height="360" aria-label="Front view" data-i18n-aria="aria.vfront"></canvas><span data-i18n="v.front">Front</span></div>
+          <div class="vcell"><canvas id="mv-side" width="480" height="360" aria-label="Side view" data-i18n-aria="aria.vside"></canvas><span><span id="side-label">Side (from the right)</span><button id="flip-side" data-i18n="flip">Other side</button></span></div>
+          <div class="vcell"><canvas id="mv-top" width="480" height="360" aria-label="Top view" data-i18n-aria="aria.vtop"></canvas><span data-i18n="v.top">Top</span></div>
+          <div class="vcell"><canvas id="mv-iso" width="480" height="360" aria-label="Oblique view" data-i18n-aria="aria.viso"></canvas><span data-i18n="v.iso">Oblique</span></div>
         </div>
       </section>
-      <section class="panel photos" id="photos" aria-label="实拍照片">
-        <h2>实拍三视图</h2>
+      <section class="panel photos" id="photos" aria-label="Photos" data-i18n-aria="aria.photos">
+        <h2 data-i18n="photos">Photographed views</h2>
         <div class="pgrid">
-          <figure><img id="ph-front" alt=""><figcaption>正视</figcaption></figure>
-          <figure><img id="ph-side" alt=""><figcaption>侧视</figcaption></figure>
-          <figure><img id="ph-top" alt=""><figcaption>俯视</figcaption></figure>
+          <figure><img id="ph-front" alt=""><figcaption data-i18n="v.front">Front</figcaption></figure>
+          <figure><img id="ph-side" alt=""><figcaption data-i18n="v.side">Side</figcaption></figure>
+          <figure><img id="ph-top" alt=""><figcaption data-i18n="v.top">Top</figcaption></figure>
         </div>
       </section>
       <section class="panel note" aria-live="polite">
-        <h2 id="note-title">说明</h2>
+        <h2 id="note-title">Notes</h2>
         <p id="note-text"></p>
       </section>
     </div>
   </div>
 
   <details class="code">
-    <summary>方案代码（复制保存 / 粘贴载入）</summary>
-    <textarea id="code" spellcheck="false" aria-label="方案代码"></textarea>
+    <summary data-i18n="code.sum">Layout code (copy to save / paste to load)</summary>
+    <textarea id="code" spellcheck="false" aria-label="Layout code" data-i18n-aria="aria.code"></textarea>
     <div class="row" style="margin-top:8px">
-      <button class="btn" id="btn-copy">复制代码</button>
-      <button class="btn" id="btn-load">载入上面的代码</button>
+      <button class="btn" id="btn-copy" data-i18n="copy">Copy code</button>
+      <button class="btn" id="btn-load" data-i18n="load">Load the code above</button>
     </div>
   </details>
 </div>
@@ -1239,23 +1241,38 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
 </script>
 <script>
 (function () {
+  // ---------------- language ----------------
+  var I18N = { en: {"title": "Paper Cup Builder", "sub": "Load a target structure from either round of Activity 2, or build your own. Click the table to place a cup, click the top of a cup to stack; drag to orbit. The three views on the right update live and can be used directly as puzzle cards.", "aria.preset": "Choose a structure", "new": "New blank", "undo": "Undo", "aria.build": "Build area", "fallback": "The 3D view failed to load. Check your connection and refresh.", "hint": "Left-click place · Right-click remove · Drag orbit · Wheel zoom", "aria.tools": "Tools", "lab.tool": "Tool", "tool.up": "Upright", "tool.down": "Inverted", "tool.side": "On its side", "tool.straw": "Straw", "tool.erase": "Remove", "aria.dir": "Direction", "lab.dir": "Facing", "dir.front": "Front", "dir.back": "Back", "dir.left": "Left", "dir.right": "Right", "dir.cycle": "R to cycle", "aria.straw": "Straw type", "lab.straw": "Straw", "st.bent": "Bent 90°", "st.up": "Straight · head up", "st.down": "Straight · head down", "undotip": "Made a mistake? Click “Undo” above or press Ctrl+Z to step back. To pull a straw or take a cup away, pick the “Remove” tool and click it, or simply <b>right-click</b> it. One thing goes per click: straws first, then the top cup.", "lg.note": "(switch to plain paper colour at the top right)", "aria.views": "Three views", "views": "Three views (orthographic)", "tint": "Colour by orientation", "v.front": "Front", "v.side": "Side", "v.top": "Top", "v.iso": "Oblique", "aria.vfront": "Front view", "aria.vside": "Side view", "aria.vtop": "Top view", "aria.viso": "Oblique view", "flip": "Other side", "aria.photos": "Photos", "photos": "Photographed views", "notes": "Notes", "code.sum": "Layout code (copy to save / paste to load)", "aria.code": "Layout code", "copy": "Copy code", "load": "Load the code above", "aria.lang": "Switch language", "og.r1": "Round 1", "og.r2": "Round 2 (side cups and straws)", "og.mine": "My builds", "free": "Free build", "hiddenCup": "Hidden cup: ", "designedTail": " Once it is built, photograph it from the directions shown in the views on the right.", "rules": "Rules: every cup (or stack) must touch at least one other cup. Only an inverted cup can go on an upright one (rim to rim, a drum) and only an upright cup on an inverted one (base to base, an hourglass); same-way cups would nest. At most three levels. Nothing goes on a side cup or on a cup holding a straw. Straws only go in a cup whose top level is upright: either bent 90° and standing against the wall, or straight and leaning on the rim (head up or head down). They run front–back or left–right only, along a diameter of the cup floor. Two straws on the same diameter lie side by side with a gap running exactly along it.", "sideFromL": "Side (from the left)", "sideFromR": "Side (from the right)", "hint.bent": "short piece flat on the floor, long piece straight up against the wall on the “Facing” side", "hint.up": "not bent, bellows at the top, leaning on the rim on the “Facing” side", "hint.down": "not bent, bellows on the floor, leaning on the rim on the “Facing” side", "m.copied": "Layout code copied", "m.copyManual": "Code selected; copy it manually", "m.loaded": "Layout loaded", "m.loadedLonely": "Layout loaded, but {n} cup(s) touch no other cup", "m.badCode": "That code is not valid; paste the full code copied from here", "m.lonely": "Every cup must touch another cup; this spot is too far from the rest", "m.noStackSide": "Nothing can be stacked on a side cup", "m.noStackStraw": "Nothing can be stacked on a cup holding a straw", "m.max3": "Three levels at most", "m.nest": "Same-way cups nest: put inverted on upright, upright on inverted", "m.sideFloor": "A side cup can only go on an empty spot on the table", "m.clickUpright": "Click an upright cup to add a straw", "m.sideNoStraw": "Side cups take no straws", "m.topInverted": "The top cup is inverted, so no straw can go in", "m.max2": "Two straws per cup at most; to pull one, use Remove or right-click the cup", "m.wouldIsolate": "Removing this would leave a neighbouring cup on its own; move that cup first", "m.strawPulled": "Straw pulled", "m.topRemoved": "Top cup removed", "m.cupRemoved": "Cup removed", "photoAlt": " photo"},
+    zh: {"title": "纸杯搭建台", "sub": "载入两轮活动二的目标结构，或者自己搭一个新的。点桌面放杯，点杯顶叠层；拖动旋转视角。右侧三视图随时更新，可以直接拿来出题。", "aria.preset": "选择结构", "new": "新建空白", "undo": "撤销", "aria.build": "搭建区", "fallback": "3D 画面加载失败，请检查网络后刷新。", "hint": "左键放置 · 右键拿走 · 拖动旋转 · 滚轮缩放", "aria.tools": "工具", "lab.tool": "工具", "tool.up": "正放", "tool.down": "倒扣", "tool.side": "侧放", "tool.straw": "吸管", "tool.erase": "拿走", "aria.dir": "朝向", "lab.dir": "朝向", "dir.front": "朝前", "dir.back": "朝后", "dir.left": "朝左", "dir.right": "朝右", "dir.cycle": "R 键轮换", "aria.straw": "吸管放法", "lab.straw": "吸管", "st.bent": "90°折弯", "st.up": "直插·头朝上", "st.down": "直插·头朝下", "undotip": "放错了？点上方「撤销」或按 Ctrl+Z 退回上一步。要拔吸管、拿走杯：选「拿走」工具点它，或直接<b>右键</b>点它，一次拿掉一样（先拔吸管，再拿最上层的杯）。", "lg.note": "（颜色可在右上切换为原色）", "aria.views": "三视图", "views": "三视图（正交投影）", "tint": "按朝向上色", "v.front": "正视", "v.side": "侧视", "v.top": "俯视", "v.iso": "斜视", "aria.vfront": "正视图", "aria.vside": "侧视图", "aria.vtop": "俯视图", "aria.viso": "斜视图", "flip": "换另一侧", "aria.photos": "实拍照片", "photos": "实拍三视图", "notes": "说明", "code.sum": "方案代码（复制保存 / 粘贴载入）", "aria.code": "方案代码", "copy": "复制代码", "load": "载入上面的代码", "aria.lang": "切换语言", "og.r1": "第一轮", "og.r2": "第二轮（可侧放、带吸管）", "og.mine": "我的搭建", "free": "自由搭建", "hiddenCup": "三张图都拍不到的杯：", "designedTail": " 摆好后照右侧三视图的方向拍照即可。", "rules": "摆放规则：每只杯（或每一叠）至少要和一只杯挨着。正放杯上面只能倒扣（口对口成腰鼓），倒扣杯上面只能正放（底对底成沙漏），同向会套进去，最多叠三层。侧放杯和插了吸管的杯上面不能再叠。吸管只插在最上层是正放的杯里：要么 90° 折弯贴壁竖起，要么不折弯斜靠杯沿（头朝上或头朝下）；只能前后或左右摆，沿杯底直径。两根用同一条直径时并排放，中间留一条正好沿直径的缝。", "sideFromL": "侧视（从左看）", "sideFromR": "侧视（从右看）", "hint.bent": "短段平躺杯底，长段贴着“朝向”那侧的杯壁竖直立起", "hint.up": "不折弯，折弯段在上，斜靠在“朝向”那侧的杯沿", "hint.down": "不折弯，折弯段抵住杯底，斜靠在“朝向”那侧的杯沿", "m.copied": "已复制方案代码", "m.copyManual": "已选中代码，请手动复制", "m.loaded": "已载入方案", "m.loadedLonely": "已载入方案，但有 {n} 处杯没挨着其他杯", "m.badCode": "代码格式不对，请粘贴从这里复制出来的完整代码", "m.lonely": "每只杯至少要挨着一只杯，这里离其他杯太远", "m.noStackSide": "侧放杯上面不能再叠", "m.noStackStraw": "插了吸管的杯上面不能再叠", "m.max3": "最多叠三层", "m.nest": "同向叠会套进去：正放上叠倒扣，倒扣上叠正放", "m.sideFloor": "侧放杯只能放在桌面空位上", "m.clickUpright": "点一只正放的杯来插吸管", "m.sideNoStraw": "侧放杯不插吸管", "m.topInverted": "最上层是倒扣杯，插不了吸管", "m.max2": "一只杯最多插两根吸管；要拔掉请用「拿走」或右键点这只杯", "m.wouldIsolate": "拿走它会让旁边的杯落单，先挪开那只杯", "m.strawPulled": "已拔掉一根吸管", "m.topRemoved": "已拿走最上层的杯", "m.cupRemoved": "已拿走这只杯", "photoAlt": " 照片"} };
+  var LANG = (function () {
+    var q = /[?&]lang=(zh|en)/.exec(location.search); if (q) return q[1];
+    try { var v = localStorage.getItem('cupbuild-lang'); if (v === 'zh' || v === 'en') return v; } catch (e) {}
+    return /^zh/i.test(navigator.language || '') ? 'zh' : 'en';
+  })();
+  function tr(k, vars) { var s = (I18N[LANG] && I18N[LANG][k]) || I18N.en[k] || k; for (var n in vars) s = s.replace('{' + n + '}', vars[n]); return s; }
+  function localized(o) { return typeof o === 'string' ? o : (o[LANG] || o.en); }
+  function presetLabel(p) {
+    return LANG === 'zh' ? '第' + (p.round === 1 ? '一' : '二') + '轮 · 第 ' + p.group + ' 组' + (p.designed ? '（设计）' : '')
+                         : 'Round ' + p.round + ' · Group ' + p.group + (p.designed ? ' (designed)' : '');
+  }
+
   // ---------------- preset data ----------------
   // u,v: position in the top-view photo (u → right, v → down), in cup diameters.
   // front: where the front-view camera stood in that photo (W/E/S); side: 'R' or 'L' of the front viewer.
-  // s: U 正放 · D 倒扣 · HG 沙漏(下倒扣上正放) · BR 腰鼓(下正放上倒扣) · S 侧放(open = 杯口方向)
+  // s: U upright · D inverted · HG hourglass (inverted below, upright on top) · BR drum (upright below, inverted on top) · S on its side (open = direction of the mouth)
   var R1 = [
     { front: 'W', side: 'R', cols: [[0,0,'D'],[1,0,'U'],[0,1,'HG'],[1,1,'BR'],[2,1,'D'],[1,2,'D'],[1,3,'D']],
-      hidden: '中间那摞腰鼓的下层杯三张图都拍不到，只能从上层倒扣杯在第二层高度反推它是正放。' },
+      hidden: { en: 'The lower cup of the middle drum shows in none of the three photos; the inverted cup sitting at second-level height tells you it must be upright.', zh: "中间那摞腰鼓的下层杯三张图都拍不到，只能从上层倒扣杯在第二层高度反推它是正放。" } },
     { front: 'W', side: 'R', cols: [[0,0,'U'],[1,0,'HG'],[0,1,'HG'],[1,1,'U'],[0,2,'U'],[1,2,'U'],[1,3,'D']],
-      hidden: '右上角沙漏的下层杯三张图都拍不到，只能从上层正放杯在第二层高度反推它是倒扣。' },
+      hidden: { en: 'The lower cup of the top-right hourglass shows in none of the three photos; the upright cup sitting at second-level height tells you it must be inverted.', zh: "右上角沙漏的下层杯三张图都拍不到，只能从上层正放杯在第二层高度反推它是倒扣。" } },
     { front: 'E', side: 'R', cols: [[0.3,0.3,'U'],[1.9,0,'BR'],[0.95,0.95,'HG'],[1.9,0.95,'D'],[0.3,1.6,'BR'],[1.9,1.9,'U']],
-      hidden: '左下腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' },
+      hidden: { en: 'The lower cup of the bottom-left drum shows in none of the three photos; only the height tells you it is upright.', zh: "左下腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。" } },
     { front: 'W', side: 'R', cols: [[0,0,'D'],[0,0.95,'U'],[0,1.9,'D'],[0,2.85,'BR'],[1,1.9,'D'],[1.95,1,'U'],[1.9,-0.05,'BR']],
-      hidden: '右上腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' },
+      hidden: { en: 'The lower cup of the top-right drum shows in none of the three photos; only the height tells you it is upright.', zh: "右上腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。" } },
     { front: 'S', side: 'R', cols: [[-1,0,'HG'],[0,0,'U'],[1,0,'D'],[1.95,0,'U'],[0,-0.97,'BR'],[1.02,-0.97,'HG']],
-      hidden: '后排左边腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' },
+      hidden: { en: 'The lower cup of the drum at the back left shows in none of the three photos; only the height tells you it is upright.', zh: "后排左边腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。" } },
     { front: 'S', side: 'R', cols: [[0,0,'U'],[1,0,'D'],[1.95,0,'U'],[0,-1,'HG'],[1,-1,'HG'],[0,-2,'HG']],
-      hidden: '中排左边沙漏的下层杯三张图都拍不到，只能从高度反推它是倒扣。' }
+      hidden: { en: 'The lower cup of the hourglass at the middle left shows in none of the three photos; only the height tells you it is inverted.', zh: "中排左边沙漏的下层杯三张图都拍不到，只能从高度反推它是倒扣。" } }
   ];
   // round 2: items {u,v,s,open,straws:[...]}
   // Two ways a straw sits in a cup (all lengths in cm, directions in top-photo coordinates):
@@ -1273,30 +1290,30 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
     { front: 'E', side: 'L', items: [
       it(-1,-1,'D'), it(0,-1,'U',{straws:[bent([0,-1])]}), it(-1,0,'S',{open:[0,1]}), it(0,0,'BR'),
       it(1.05,0,'S',{open:[1,0]}), it(0,1.05,'U',{straws:[bent([0,1])]}) ],
-      text: '中间腰鼓的下层杯三张图都拍不到。注意这一组的侧视照片是从正视的左手边拍的，和其他组相反。' },
+      text: { en: 'The lower cup of the middle drum shows in none of the three photos. Note that this group’s side photo was taken from the front viewer’s left, unlike the other groups.', zh: "中间腰鼓的下层杯三张图都拍不到。注意这一组的侧视照片是从正视的左手边拍的，和其他组相反。" } },
     { front: 'W', side: 'R', items: [
       it(0,-1.95,'S',{open:[0,-1]}), it(0,-0.95,'D'), it(-0.95,0,'HG'), it(0,0,'U',{straws:[bent([1,0])]}),
       it(1.05,0,'S',{open:[1,0]}), it(0,1.1,'U',{straws:[bent([-1,0])]}) ],
-      text: '沙漏两层在正视里都能看到。两根吸管都是 90° 折弯：短段平躺杯底，长段贴着杯壁竖直立起，所以长段不在杯子正中，两根分别贴在相反的两侧。' },
+      text: { en: 'Both levels of the hourglass are visible in the front view. Both straws are bent 90°: the short piece lies flat on the cup floor and the long piece stands straight up against the wall, so it is off-centre; the two straws stand against opposite walls.', zh: "沙漏两层在正视里都能看到。两根吸管都是 90° 折弯：短段平躺杯底，长段贴着杯壁竖直立起，所以长段不在杯子正中，两根分别贴在相反的两侧。" } },
     { front: 'W', side: 'R', items: [
       it(0,-0.9,'U',{straws:[straight([1,0],'up')]}), it(-1,0,'D'), it(0,0,'D'), it(1.1,0,'S',{open:[1,0]}),
       it(-1,1.0,'S',{open:[0,1]}), it(0,1.1,'U',{straws:[bent([-1,0])]}), it(1,1.15,'D') ],
-      text: '7 只杯全是单层，没有叠放。上方杯的吸管没有折弯，头朝上（折弯段在上），斜靠在杯沿上；下方杯的吸管 90° 折弯，短段平躺杯底，长段贴着靠正视一侧的杯壁竖起。' },
+      text: { en: 'All 7 cups are single, nothing is stacked. The straw in the upper cup is not bent; it is head up (bellows at the top) and leans on the rim. The straw in the lower cup is bent 90°: the short piece lies on the floor and the long piece stands against the wall nearest the front viewer.', zh: "7 只杯全是单层，没有叠放。上方杯的吸管没有折弯，头朝上（折弯段在上），斜靠在杯沿上；下方杯的吸管 90° 折弯，短段平躺杯底，长段贴着靠正视一侧的杯壁竖起。" } },
     { front: 'W', side: 'R', items: [
       it(0,-1.95,'D'), it(-0.05,-1.0,'S',{open:[-1,0]}), it(1.0,-1.05,'BR'), it(-1,0,'D'), it(0,0,'U'),
       it(1,0,'U',{straws:[bent([-1,0],1), straight([1,0],'down',-1)]}) ],
-      text: '右下那只杯插了两根吸管：一根 90° 折弯，长段贴着靠正视一侧的杯壁竖起；另一根没有折弯，头朝下（折弯段在杯底），斜靠在后侧杯沿上。两根沿同一条直径并排，中间留一条沿直径的缝。右上腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' }
+      text: { en: 'The bottom-right cup holds two straws: one bent 90°, its long piece standing against the wall nearest the front viewer; the other not bent, head down (bellows on the floor), leaning on the far rim. They share one diameter, lying side by side with a gap running exactly along it. The lower cup of the top-right drum shows in none of the three photos; only the height tells you it is upright.', zh: "右下那只杯插了两根吸管：一根 90° 折弯，长段贴着靠正视一侧的杯壁竖起；另一根没有折弯，头朝下（折弯段在杯底），斜靠在后侧杯沿上。两根沿同一条直径并排，中间留一条沿直径的缝。右上腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。" } }
   ];
   // round 2 designed groups, already in world convention (u = X right, v = Z toward front viewer)
   var R2D = [
     { front: 'S', side: 'R', designed: true, items: [
       it(0,0,'HG',{straws:[bent([1,0])]}), it(1,0,'D'), it(2,0.04,'S',{open:[0,1]}), it(-1.05,0,'S',{open:[-1,0]}),
       it(0,1.05,'D'), it(1,1.05,'U',{straws:[straight([0,-1],'up')]}) ],
-      text: '设计组。正视里中间看起来像一个沙漏，其实下半截是前排一只单独的倒扣杯，真正的沙漏在它后面，俯视才能看出来。沙漏下层杯三张图都被挡住，只能从高度反推它是倒扣。' },
+      text: { en: 'Designed group. The middle of the front view looks like an hourglass, but its lower half is a separate inverted cup in the front row; the real hourglass stands behind it, which only the top view reveals. The hourglass’s lower cup is hidden in all three views; only the height tells you it is inverted.', zh: "设计组。正视里中间看起来像一个沙漏，其实下半截是前排一只单独的倒扣杯，真正的沙漏在它后面，俯视才能看出来。沙漏下层杯三张图都被挡住，只能从高度反推它是倒扣。" } },
     { front: 'S', side: 'R', designed: true, items: [
       it(0,0,'BR'), it(1,0,'U',{straws:[straight([1,0],'down')]}), it(1.05,-1,'S',{open:[1,0]}),
       it(-1,0,'U',{straws:[bent([0,1])]}), it(0,1.05,'D'), it(1,1.05,'S',{open:[0,1]}) ],
-      text: '设计组。正视里中间像是两只倒扣杯叠在一起，但同向会套进去，说明上面那只在后排，是腰鼓的上层。右边正放杯的吸管没有折弯，头朝下斜靠在右侧杯沿上：侧视里它正对镜头方向倾斜，看起来是竖直的，只有正视能看出它斜着。腰鼓下层杯三张图都看不到，只能反推它是正放。' }
+      text: { en: 'Designed group. The middle of the front view looks like two inverted cups stacked, but same-way cups would nest, so the upper one must be further back: it is the top of a drum. The straw in the right-hand upright cup is not bent; it is head down and leans on the right rim. It tilts straight toward the side camera, so it looks vertical in the side view; only the front view shows the slant. The drum’s lower cup is hidden in all three views; only the height tells you it is upright.', zh: "设计组。正视里中间像是两只倒扣杯叠在一起，但同向会套进去，说明上面那只在后排，是腰鼓的上层。右边正放杯的吸管没有折弯，头朝下斜靠在右侧杯沿上：侧视里它正对镜头方向倾斜，看起来是竖直的，只有正视能看出它斜着。腰鼓下层杯三张图都看不到，只能反推它是正放。" } }
   ];
 
   function toWorld(front, u, v) {
@@ -1330,17 +1347,17 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
   }
 
   var PRESETS = [];
-  R1.forEach(function (p, i) { PRESETS.push({ id: 'r1g' + (i + 1), label: '第一轮 · 第 ' + (i + 1) + ' 组', photos: 'img/g' + (i + 1) + '_', note: '三张图都拍不到的杯：' + p.hidden, data: convert(p) }); });
-  R2.forEach(function (p, i) { PRESETS.push({ id: 'r2g' + (i + 1), label: '第二轮 · 第 ' + (i + 1) + ' 组', photos: 'img/r2g' + (i + 1) + '_', note: p.text, data: convert(p) }); });
-  R2D.forEach(function (p, i) { PRESETS.push({ id: 'r2g' + (i + 5), label: '第二轮 · 第 ' + (i + 5) + ' 组（设计）', photos: null, note: p.text, designed: true, data: convert(p) }); });
+  R1.forEach(function (p, i) { PRESETS.push({ id: 'r1g' + (i + 1), round: 1, group: i + 1, photos: 'img/g' + (i + 1) + '_', note: p.hidden, hiddenNote: true, data: convert(p) }); });
+  R2.forEach(function (p, i) { PRESETS.push({ id: 'r2g' + (i + 1), round: 2, group: i + 1, photos: 'img/r2g' + (i + 1) + '_', note: p.text, data: convert(p) }); });
+  R2D.forEach(function (p, i) { PRESETS.push({ id: 'r2g' + (i + 5), round: 2, group: i + 5, photos: null, note: p.text, designed: true, data: convert(p) }); });
 
   // ---------------- UI wiring ----------------
   var sel = document.getElementById('preset');
-  var g1 = document.createElement('optgroup'); g1.label = '第一轮';
-  var g2 = document.createElement('optgroup'); g2.label = '第二轮（可侧放、带吸管）';
-  var g3 = document.createElement('optgroup'); g3.label = '我的搭建';
-  PRESETS.forEach(function (p, i) { var o = document.createElement('option'); o.value = p.id; o.textContent = p.label; (p.id.indexOf('r1') === 0 ? g1 : g2).appendChild(o); });
-  var oc = document.createElement('option'); oc.value = 'custom'; oc.textContent = '自由搭建'; g3.appendChild(oc);
+  var g1 = document.createElement('optgroup'); g1.label = tr('og.r1');
+  var g2 = document.createElement('optgroup'); g2.label = tr('og.r2');
+  var g3 = document.createElement('optgroup'); g3.label = tr('og.mine');
+  PRESETS.forEach(function (p, i) { var o = document.createElement('option'); o.value = p.id; o.textContent = presetLabel(p); (p.id.indexOf('r1') === 0 ? g1 : g2).appendChild(o); });
+  var oc = document.createElement('option'); oc.value = 'custom'; oc.textContent = tr('free'); g3.appendChild(oc);
   sel.appendChild(g1); sel.appendChild(g2); sel.appendChild(g3);
 
   var state = { items: [], side: 'R', topUp: [0, -1] };
@@ -1363,7 +1380,7 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
   function counts() {
     var cups = 0, straws = 0;
     state.items.forEach(function (i) { cups += i.kind === 'col' ? i.cups.length : 1; straws += (i.straws || []).length; });
-    document.getElementById('count').innerHTML = '<b>' + cups + '</b> 只杯 · <b>' + straws + '</b> 根吸管';
+    document.getElementById('count').innerHTML = (LANG === 'zh' ? '<b>' + cups + '</b> 只杯 · <b>' + straws + '</b> 根吸管' : '<b>' + cups + '</b> ' + (cups === 1 ? 'cup' : 'cups') + ' · <b>' + straws + '</b> ' + (straws === 1 ? 'straw' : 'straws'));
   }
 
   function renderInfo() {
@@ -1372,20 +1389,20 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
     if (p && p.photos) {
       photos.hidden = false;
       ['front', 'side', 'top'].forEach(function (v) {
-        var img = document.getElementById('ph-' + v); img.src = (window.__IMG && window.__IMG[p.photos + v + '.jpg']) || (p.photos + v + '.jpg'); img.alt = p.label + ' ' + v + ' 照片';
+        var img = document.getElementById('ph-' + v); img.src = (window.__IMG && window.__IMG[p.photos + v + '.jpg']) || (p.photos + v + '.jpg'); img.alt = presetLabel(p) + ' ' + tr('v.' + v) + tr('photoAlt');
       });
     } else photos.hidden = true;
     var title = document.getElementById('note-title'), text = document.getElementById('note-text');
     if (p) {
-      title.textContent = p.label;
+      title.textContent = presetLabel(p);
       text.className = p.designed ? 'design' : 'hidden-cup';
-      text.textContent = p.note + (p.designed ? ' 摆好后照右侧三视图的方向拍照即可。' : '');
+      text.textContent = (p.hiddenNote ? tr('hiddenCup') : '') + localized(p.note) + (p.designed ? tr('designedTail') : '');
     } else {
-      title.textContent = '自由搭建';
+      title.textContent = tr('free');
       text.className = '';
-      text.textContent = '摆放规则：每只杯（或每一叠）至少要和一只杯挨着。正放杯上面只能倒扣（口对口成腰鼓），倒扣杯上面只能正放（底对底成沙漏），同向会套进去，最多叠三层。侧放杯和插了吸管的杯上面不能再叠。吸管只插在最上层是正放的杯里：要么 90° 折弯贴壁竖起，要么不折弯斜靠杯沿（头朝上或头朝下）；只能前后或左右摆，沿杯底直径。两根用同一条直径时并排放，中间留一条正好沿直径的缝。';
+      text.textContent = tr('rules');
     }
-    document.getElementById('side-label').textContent = '侧视（从' + (state.side === 'L' ? '左' : '右') + '看）';
+    document.getElementById('side-label').textContent = tr(state.side === 'L' ? 'sideFromL' : 'sideFromR');
     sel.value = p ? p.id : 'custom';
   }
 
@@ -1395,10 +1412,7 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
     document.querySelectorAll('[data-stype]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.stype === stype)); });
     document.getElementById('dirrow').hidden = !(tool === 'side' || tool === 'straw');
     document.getElementById('tiltrow').hidden = tool !== 'straw';
-    document.getElementById('stype-hint').textContent = {
-      bent: '短段平躺杯底，长段贴着“朝向”那侧的杯壁竖直立起',
-      up: '不折弯，折弯段在上，斜靠在“朝向”那侧的杯沿',
-      down: '不折弯，折弯段抵住杯底，斜靠在“朝向”那侧的杯沿' }[stype];
+    document.getElementById('stype-hint').textContent = tr('hint.' + stype);
   }
   document.querySelectorAll('[data-tool]').forEach(function (b) { b.addEventListener('click', function () { tool = b.dataset.tool; syncTools(); if (api) api.updateGhost(); }); });
   document.querySelectorAll('[data-dir]').forEach(function (b) { b.addEventListener('click', function () { dirKey = b.dataset.dir; syncTools(); if (api) api.updateGhost(); }); });
@@ -1422,8 +1436,8 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
   }
   document.getElementById('btn-copy').addEventListener('click', function () {
     var ta = document.getElementById('code'); ta.value = JSON.stringify(state);
-    var done = function () { toast('已复制方案代码'); };
-    try { navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); toast('已选中代码，请手动复制'); }); } catch (e) { ta.select(); toast('已选中代码，请手动复制'); }
+    var done = function () { toast(tr('m.copied')); };
+    try { navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); toast(tr('m.copyManual')); }); } catch (e) { ta.select(); toast(tr('m.copyManual')); }
   });
   document.getElementById('btn-load').addEventListener('click', function () {
     try {
@@ -1432,8 +1446,8 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
       pushUndo(); presetId = 'custom'; state = { items: s.items, side: s.side === 'L' ? 'L' : 'R', topUp: Array.isArray(s.topUp) ? s.topUp : [0, -1] };
       afterChange(true);
       var lone = window.__cupTool && window.__cupTool.isolated ? window.__cupTool.isolated().length : 0;
-      toast(lone ? '已载入方案，但有 ' + lone + ' 处杯没挨着其他杯' : '已载入方案');
-    } catch (e) { toast('代码格式不对，请粘贴从这里复制出来的完整代码'); }
+      toast(lone ? tr('m.loadedLonely', { n: lone }) : tr('m.loaded'));
+    } catch (e) { toast(tr('m.badCode')); }
   });
   document.addEventListener('keydown', function (e) {
     if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')) return;
@@ -1456,6 +1470,24 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
   } catch (e) { state = clone(PRESETS.filter(function (x) { return x.id === presetId; })[0].data); }
   var hm = /^#(r[12]g[1-6])$/.exec(location.hash || '');
   if (hm) { presetId = hm[1]; state = clone(PRESETS.filter(function (x) { return x.id === presetId; })[0].data); }
+  function applyLang() {
+    document.documentElement.lang = LANG === 'zh' ? 'zh-CN' : 'en';
+    document.title = tr('title');
+    document.querySelectorAll('[data-i18n]').forEach(function (el) { el.textContent = tr(el.dataset.i18n); });
+    document.querySelectorAll('[data-i18n-html]').forEach(function (el) { el.innerHTML = tr(el.dataset.i18nHtml); });
+    document.querySelectorAll('[data-i18n-aria]').forEach(function (el) { el.setAttribute('aria-label', tr(el.dataset.i18nAria)); });
+    g1.label = tr('og.r1'); g2.label = tr('og.r2'); g3.label = tr('og.mine'); oc.textContent = tr('free');
+    sel.querySelectorAll('option').forEach(function (o) { var p = PRESETS.filter(function (x) { return x.id === o.value; })[0]; if (p) o.textContent = presetLabel(p); });
+    var lb = document.getElementById('btn-lang');
+    lb.textContent = LANG === 'zh' ? 'English' : '中文'; lb.lang = LANG === 'zh' ? 'en' : 'zh-CN';
+    syncTools(); counts(); renderInfo();
+  }
+  document.getElementById('btn-lang').addEventListener('click', function () {
+    LANG = LANG === 'zh' ? 'en' : 'zh';
+    try { localStorage.setItem('cupbuild-lang', LANG); } catch (e) {}
+    applyLang();
+  });
+  applyLang();
   syncTools(); counts(); renderInfo(); persist();
 
   if (typeof THREE === 'undefined' || !THREE.OrbitControls) { document.getElementById('fallback').hidden = false; return; }
@@ -1750,12 +1782,12 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
     return false;
   }
   function isolated(items) { return items.filter(function (x) { return items.length > 1 && !hasNeighbour(x, items); }); }
-  var LONELY = '每只杯至少要挨着一只杯，这里离其他杯太远';
+  var LONELY = 'm.lonely';
   function canStack(item, orient) {
-    if (item.kind !== 'col') return '侧放杯上面不能再叠';
-    if ((item.straws || []).length) return '插了吸管的杯上面不能再叠';
-    if (item.cups.length >= 3) return '最多叠三层';
-    if (item.cups[item.cups.length - 1] === orient) return '同向叠会套进去：正放上叠倒扣，倒扣上叠正放';
+    if (item.kind !== 'col') return tr('m.noStackSide');
+    if ((item.straws || []).length) return tr('m.noStackStraw');
+    if (item.cups.length >= 3) return tr('m.max3');
+    if (item.cups[item.cups.length - 1] === orient) return tr('m.nest');
     return '';
   }
   function evaluate(hit) {
@@ -1769,22 +1801,22 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
           act: function () { item.cups.push(tool); } };
       }
       var nc = { kind: 'col', x: hit.x, z: hit.z, cups: [tool] }, lonely = state.items.length && !hasNeighbour(nc, state.items);
-      return { ok: !lonely, msg: lonely ? LONELY : '', ghost: { kind: 'stack', x: hit.x, z: hit.z, level: 0, orient: tool },
+      return { ok: !lonely, msg: lonely ? tr(LONELY) : '', ghost: { kind: 'stack', x: hit.x, z: hit.z, level: 0, orient: tool },
         act: function () { state.items.push({ kind: 'col', x: hit.x, z: hit.z, cups: [tool], straws: [] }); } };
     }
     if (tool === 'side') {
-      if (hit.idx !== undefined) return { ok: false, msg: '侧放杯只能放在桌面空位上' };
+      if (hit.idx !== undefined) return { ok: false, msg: tr('m.sideFloor') };
       var ns = { kind: 'side', x: hit.x, z: hit.z, dir: dir.slice() }, lonely2 = state.items.length && !hasNeighbour(ns, state.items);
-      return { ok: !lonely2, msg: lonely2 ? LONELY : '', ghost: { kind: 'side', x: hit.x, z: hit.z, dir: dir.slice() },
+      return { ok: !lonely2, msg: lonely2 ? tr(LONELY) : '', ghost: { kind: 'side', x: hit.x, z: hit.z, dir: dir.slice() },
         act: function () { state.items.push({ kind: 'side', x: hit.x, z: hit.z, dir: dir.slice(), straws: [] }); } };
     }
     if (tool === 'straw') {
-      if (hit.idx === undefined) return { ok: false, msg: '点一只正放的杯来插吸管' };
+      if (hit.idx === undefined) return { ok: false, msg: tr('m.clickUpright') };
       var it3 = state.items[hit.idx];
-      if (it3.kind !== 'col') return { ok: false, msg: '侧放杯不插吸管', hover: hit.idx };
-      if (it3.kind === 'col' && it3.cups[it3.cups.length - 1] !== 'up') return { ok: false, msg: '最上层是倒扣杯，插不了吸管', hover: hit.idx };
+      if (it3.kind !== 'col') return { ok: false, msg: tr('m.sideNoStraw'), hover: hit.idx };
+      if (it3.kind === 'col' && it3.cups[it3.cups.length - 1] !== 'up') return { ok: false, msg: tr('m.topInverted'), hover: hit.idx };
       var have = it3.straws || [];
-      if (have.length >= 2) return { ok: false, msg: '一只杯最多插两根吸管；要拔掉请用「拿走」或右键点这只杯', hover: hit.idx };
+      if (have.length >= 2) return { ok: false, msg: tr('m.max2'), hover: hit.idx };
       return { ok: true, hover: hit.idx, act: function () { it3.straws = have; var d = dir.slice();
         it3.straws.push(stype === 'bent' ? { kind: 'bent', dir: d } : { kind: 'straight', dir: d, head: stype }); } };
     }
@@ -1793,8 +1825,8 @@ details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 
       var it4 = state.items[hit.idx];
       var removesItem = !(it4.straws || []).length && !(it4.kind === 'col' && it4.cups.length > 1);
       if (removesItem && isolated(state.items.filter(function (x) { return x !== it4; })).length)
-        return { ok: false, hover: hit.idx, msg: '拿走它会让旁边的杯落单，先挪开那只杯' };
-      var what = (it4.straws || []).length ? '已拔掉一根吸管' : (it4.kind === 'col' && it4.cups.length > 1 ? '已拿走最上层的杯' : '已拿走这只杯');
+        return { ok: false, hover: hit.idx, msg: tr('m.wouldIsolate') };
+      var what = (it4.straws || []).length ? tr('m.strawPulled') : (it4.kind === 'col' && it4.cups.length > 1 ? tr('m.topRemoved') : tr('m.cupRemoved'));
       return { ok: true, hover: hit.idx, msg2: what, act: function () {
         if ((it4.straws || []).length) { it4.straws.pop(); return; }
         if (it4.kind === 'col' && it4.cups.length > 1) it4.cups.pop(); else state.items.splice(hit.idx, 1);

@@ -1,147 +1,149 @@
-# 纸杯搭建台 · Paper Cup Builder
+# Paper Cup Builder
 
-用纸杯和吸管搭结构、看三视图的 3D 小工具。它是为一节大学心理活动课做的：活动二「管中窥豹」的道具建模和出题工具。
+A small 3D tool for building structures out of paper cups and straws and looking at their three orthographic views. It was made for a university psychology activity class, as the modelling and puzzle-making tool for Activity 2, “Seeing the Leopard Through a Tube” (from the Chinese idiom *guǎn zhōng kuī bào*: judging the whole from a glimpse).
 
-- 载入两轮活动的目标结构，对照实拍的正、侧、俯三张照片查看 3D 模型。
-- 自己搭新结构，右侧实时生成正视、侧视、俯视的正交三视图，可以直接拿来出题。
-- 单文件离线版，在教室电脑上用 U 盘双击就能打开展示。
+- Load the target structures from both rounds of the activity and compare the 3D model with the photographed front, side and top views.
+- Build new structures yourself; the panel on the right renders live front, side and top orthographic views that can be used directly as puzzle cards.
+- A single-file offline version opens with a double-click from a USB stick on a classroom computer.
+- The interface switches between English and Chinese with the button at the top right. It follows the browser language at first and remembers your choice; `?lang=en` or `?lang=zh` in the URL forces one.
 
-![第二轮第 5 组设计三视图](design/round2_group5_design.png)
+![Round 2, group 5 design sheet](design/round2_group5_design.png)
 
-## 背景：活动二「管中窥豹」
+## Background: Activity 2
 
-课程主题是「去标签、不片面、多角度」，按「人 → 物 → 事」安排三个活动：
+The class theme is “drop the labels, avoid one-sided views, look from many angles”, built as three activities that move from people to objects to events:
 
-| 活动 | 名称 | 内容 |
+| Activity | Name | What it is about |
 |---|---|---|
-| 一 | 初识彼此 | 认识人：不给人贴标签 |
-| 二 | 管中窥豹 | 认识物：纸杯三视图复原 |
-| 三 | 抽丝剥茧 | 认识事：海龟汤推理 |
+| 1 | Getting to Know Each Other | People: not labelling others |
+| 2 | Seeing the Leopard Through a Tube | Objects: rebuilding paper cups from three views |
+| 3 | Unravelling the Threads | Events: lateral-thinking “turtle soup” puzzles |
 
-活动二的玩法：每组拿到一套纸杯结构的三视图（正、侧、俯三张照片），按图把真实的纸杯搭出来。
+How Activity 2 works: each team gets the three views of a paper-cup structure (front, side and top photos) and has to build the real cups to match.
 
-单看任何一张图都会漏掉信息。被挡住的杯、正放还是倒扣、吸管往哪边斜，都要把三张图放在一起推理才能确定，这正是「不片面、多角度」的意思。
+Any single view leaves something out. Hidden cups, whether a cup is upright or inverted, which way a straw leans: these can only be settled by reasoning across all three views together, which is exactly the point of “avoid one-sided views, look from many angles”.
 
-两轮的结构都存在这个工具里：
+Both rounds live in the tool:
 
-| 轮次 | 组数 | 内容 |
+| Round | Groups | Content |
 |---|---|---|
-| 第一轮 | 6 组 | 只有正放、倒扣和叠放，没有侧放和吸管 |
-| 第二轮 | 第 1–4 组 | 按实拍照片还原，加入侧放杯和吸管 |
-| 第二轮 | 第 5、6 组 | 补充设计的题目，三视图在 [`design/`](design) |
+| Round 1 | 6 groups | Upright, inverted and stacked cups only; no side cups or straws |
+| Round 2 | Groups 1–4 | Rebuilt from photos; adds cups on their side and straws |
+| Round 2 | Groups 5–6 | Additional designed puzzles; their view sheets are in [`design/`](design) |
 
-第 5、6 组的设计要点：
+What groups 5 and 6 were designed around:
 
-- 每组 7 只杯、2 根吸管。
-- 都有一摞两层的杯，下层杯在三张图里都看不到，只能根据上层杯的高度反推它的朝向。
-- 正视图里都有一个视觉陷阱：
-  - 第 5 组看着像沙漏，其实下半截是前排一只单独的倒扣杯。
-  - 第 6 组看着像两只倒扣杯叠在一起，但同向叠会套进去，所以上面那只其实在后排，是腰鼓的上层。
+- 7 cups and 2 straws each.
+- Each has a two-level stack whose lower cup is hidden in all three views; its orientation can only be worked out from the height of the cup above it.
+- Each has an illusion in the front view:
+  - Group 5 seems to show an hourglass, but its lower half is a separate inverted cup in the front row.
+  - Group 6 seems to show two inverted cups stacked, but same-way cups would nest, so the upper one is actually further back: it is the top of a drum.
 
-## 打开方式
+## Opening it
 
-| 场景 | 做法 |
+| Situation | How |
 |---|---|
-| 在线 | 仓库开启 GitHub Pages 后访问 https://zzzhida.github.io/study/paper-cup-builder/ ；或把这个文件夹下载到本地，直接打开 `index.html` |
-| 教室展示（推荐） | 把 [`dist/paper-cup-builder-offline.html`](dist/paper-cup-builder-offline.html) 拷到 U 盘，在教室电脑上用 Chrome 或 Edge 打开。不用联网、不用登录 |
+| Online | Once GitHub Pages is enabled for the repository, visit https://zzzhida.github.io/study/paper-cup-builder/ ; or download this folder and open `index.html` directly |
+| Classroom (recommended) | Copy [`dist/paper-cup-builder-offline.html`](dist/paper-cup-builder-offline.html) to a USB stick and open it in Chrome or Edge on the classroom computer. No internet or sign-in needed |
 
-教室展示的小技巧：
+Classroom tips:
 
-- 按 F11 全屏；投影上字小的话，按 Ctrl 加 + 放大页面。
-- 出题时把右上角「按朝向上色」的勾去掉，杯子变成原色，就看不出哪只正放、哪只倒扣；对答案时再勾上。
-- 老版 IE 不支持 WebGL，打不开 3D。很旧的显卡驱动会显示「3D 画面加载失败」，最好课前在那台电脑上试一次。
+- Press F11 for full screen; if text is small on the projector, press Ctrl and + to zoom the page.
+- When setting the puzzle, untick “Colour by orientation” at the top right so the cups show in plain paper colour and nobody can tell which are upright and which are inverted; tick it again to reveal the answer.
+- Old Internet Explorer has no WebGL and cannot show the 3D view. Very old graphics drivers will show “The 3D view failed to load”, so try it on that computer before class.
 
-改了 `index.html` 之后，用下面的命令重新生成离线版：
+After editing `index.html`, regenerate the offline version with:
 
 ```bash
-python3 tools/build_offline.py   # 输出 dist/paper-cup-builder-offline.html
+python3 tools/build_offline.py   # writes dist/paper-cup-builder-offline.html
 ```
 
-## 操作
+## Controls
 
-| 操作 | 方式 |
+| Action | How |
 |---|---|
-| 切换结构 | 左上角下拉菜单（第一轮 / 第二轮 / 自由搭建） |
-| 旋转、缩放视角 | 拖动旋转，滚轮缩放 |
-| 放杯 | 选「正放 1」「倒扣 2」「侧放 3」，左键点桌面；点已有的杯顶可以往上叠 |
-| 侧放杯、吸管的方向 | 「朝向」按钮（前 / 后 / 左 / 右），或按 R 轮换 |
-| 插吸管 | 选「吸管 4」，再选「90°折弯」「直插·头朝上」或「直插·头朝下」，左键点一只正放的杯 |
-| 拿走 | 右键点它，或选「拿走 5」后左键点它。一次拿掉一样：先拔吸管，再拿最上层的杯 |
-| 撤回上一步 | 顶部「撤销」按钮，或 Ctrl+Z |
-| 换侧视方向 | 侧视图下方的「换另一侧」 |
-| 保存 / 载入方案 | 「复制代码」得到一段 JSON，粘贴后点「载入上面的代码」恢复 |
+| Switch structure | Drop-down at the top left (Round 1 / Round 2 / Free build) |
+| Orbit and zoom | Drag to orbit, scroll to zoom |
+| Place a cup | Pick “Upright 1”, “Inverted 2” or “On its side 3” and left-click the table; click the top of an existing cup to stack on it |
+| Direction of side cups and straws | The “Facing” buttons (Front / Back / Left / Right), or press R to cycle |
+| Add a straw | Pick “Straw 4”, then “Bent 90°”, “Straight · head up” or “Straight · head down”, and left-click an upright cup |
+| Remove | Right-click it, or pick “Remove 5” and left-click it. One thing per click: straws first, then the top cup |
+| Undo | The “Undo” button at the top, or Ctrl+Z |
+| Flip the side view | “Other side” under the side view |
+| Switch language | “中文” / “English” button at the top right |
+| Save / load a layout | “Copy code” gives a JSON snippet; paste it back and click “Load the code above” |
 
-自由搭建的结构会自动存在当前浏览器的 localStorage 里，换电脑要用「复制代码」把方案带走。
+Free builds are saved automatically in the current browser’s localStorage; to take one to another computer, use “Copy code”.
 
-## 摆放规则
+## Placement rules
 
-这些规则来自真实纸杯的物理限制和课堂约定，搭建台会强制执行。
+These come from how real paper cups behave and from the rules agreed for the class. The builder enforces them.
 
-**杯子**
+**Cups**
 
-- 每只杯，或者每一摞，至少要和另一只杯挨着，不能孤零零放一只。拿走某只杯时，如果会让旁边的杯落单，也会被拒绝。
-- 正放杯上面只能倒扣，口对口成「腰鼓」；倒扣杯上面只能正放，底对底成「沙漏」。同向叠会套进去。
-- 最多叠三层。侧放杯和插了吸管的杯上面不能再叠。
-- 判断两只杯是否相邻时，会按高度逐层比较两边的半径。纸杯上大下小，一只正放杯和一只倒扣杯并排时，在各个高度上两边半径之和都是 6.4 cm，所以中心相距 6.4 cm 时就整条贴住了。中心距比这个最多再远约 1.5 cm，仍然算挨着。
+- Every cup, or every stack, must touch at least one other cup; no cup may stand on its own. Removing a cup is refused if it would leave a neighbour on its own.
+- Only an inverted cup can go on an upright one (rim to rim, a “drum”), and only an upright cup on an inverted one (base to base, an “hourglass”). Same-way cups would nest.
+- At most three levels. Nothing can be stacked on a cup lying on its side or on a cup holding a straw.
+- To decide whether two cups touch, the builder compares their radii level by level up the height. The cups taper, so when an upright cup stands beside an inverted one, their radii add up to 6.4 cm at every height; at a centre distance of 6.4 cm they touch along their whole height. Up to about 1.5 cm further apart still counts as touching.
 
-**吸管**
+**Straws**
 
-- 只插在最上层是正放的杯里，侧放杯不插。
-- 只能前后或左右摆，沿杯底的一条直径放。一只杯最多两根。
-- 两种放法：
-  - **90° 折弯**：短段平躺在杯底，长段在杯壁处竖直立起，所以长段不在杯子正中。
-  - **不折弯斜靠**：吸管伸直，下端抵在一侧杯底边缘，斜靠在对面杯沿上。分「头朝上」（折弯段在上）和「头朝下」（折弯段在杯底）两种。
-- 两根吸管用同一条直径时并排放，中间留一条正好沿直径的缝（约 0.5 cm），和第二轮第 4 组的实拍一致。两根成十字交叉时，第二根搭在第一根上面。
+- Straws only go in a cup whose top level is upright; cups on their side take none.
+- They run front–back or left–right only, along a diameter of the cup floor. Two straws per cup at most.
+- Two ways to place one:
+  - **Bent 90°**: the short piece lies flat on the cup floor and the long piece stands straight up against the wall, so the long piece is off-centre.
+  - **Straight, leaning**: the straw is not bent; its lower end rests at the edge of the floor on one side and it leans on the opposite rim. Either “head up” (bellows at the top) or “head down” (bellows on the floor).
+- Two straws on the same diameter lie side by side with a gap of about 0.5 cm running exactly along the diameter, as in the round 2, group 4 photo. When two straws cross at right angles, the second rests on top of the first.
 
-## 模型参数
+## Model dimensions
 
-| 项目 | 数值 |
+| Item | Value |
 |---|---|
-| 纸杯 | 杯口半径 3.75 cm，杯底半径 2.65 cm，高 8.2 cm |
-| 网格单位 | 1 个杯径 = 7.6 cm，自由搭建时按 0.5 个杯径对齐 |
-| 吸管 | 长段 15.2 cm，折弯段 1.3 cm，短段 4.6 cm，半径 0.3 cm |
+| Paper cup | Rim radius 3.75 cm, base radius 2.65 cm, height 8.2 cm |
+| Grid unit | 1 cup diameter = 7.6 cm; free builds snap to 0.5 cup diameters |
+| Straw | Long piece 15.2 cm, bellows 1.3 cm, short piece 4.6 cm, radius 0.3 cm |
 
-侧放杯躺倒后，杯身会按锥角自然倾斜，杯口那一端会抬起来。
+A cup lying on its side tilts naturally by its taper angle, so the rim end is raised.
 
-## 数据格式
+## Data format
 
-预设结构写在 `index.html` 里的 `R1`、`R2`、`R2D` 三个数组中。
+The preset structures are the `R1`, `R2` and `R2D` arrays in `index.html`.
 
-坐标直接从俯视照片里量：`u` 向右、`v` 向下，单位是杯径。另外记两个方向：
+Coordinates are measured straight off the top-view photo: `u` to the right, `v` downward, in cup diameters. Two directions are recorded as well:
 
-- `front`：拍正视图时相机在俯视照片的哪一边，`W`、`E`、`S` 分别是左、右、下。
-- `side`：侧视图是从正视的右手边（`R`）还是左手边（`L`）拍的。
+- `front`: which edge of the top photo the front-view camera stood at; `W`, `E` and `S` mean left, right and bottom.
+- `side`: whether the side view was taken from the front viewer’s right (`R`) or left (`L`).
 
-程序会按这两个方向，把照片坐标换算成 3D 世界坐标。
+The code uses these two to convert photo coordinates into 3D world coordinates.
 
 ```js
-// 第二轮第 4 组：正视在俯视照片的左边拍，侧视在正视右手边拍
+// Round 2, group 4: front view taken from the left edge of the top photo, side view from the front viewer's right
 { front: 'W', side: 'R', items: [
   it(0,-1.95,'D'), it(-0.05,-1.0,'S',{open:[-1,0]}), it(1.0,-1.05,'BR'), it(-1,0,'D'), it(0,0,'U'),
   it(1,0,'U',{straws:[bent([-1,0],1), straight([1,0],'down',-1)]}) ] }
 ```
 
-| 字段 | 含义 |
+| Field | Meaning |
 |---|---|
-| `U` / `D` | 正放 / 倒扣 |
-| `HG` | 沙漏，下层倒扣、上层正放 |
-| `BR` | 腰鼓，下层正放、上层倒扣 |
-| `S` | 侧放，`open` 为杯口朝向 |
-| `bent(dir, side)` | 90° 折弯吸管，长段立在 `dir` 一侧的杯壁 |
-| `straight(dir, head, side)` | 不折弯吸管，斜靠在 `dir` 一侧的杯沿；`head` 为 `'up'` 或 `'down'` |
-| `side` | 两根吸管共用一条直径时，这一根占直径哪一侧（+1 / −1） |
+| `U` / `D` | Upright / inverted |
+| `HG` | Hourglass: inverted below, upright on top |
+| `BR` | Drum: upright below, inverted on top |
+| `S` | On its side; `open` is the direction the mouth faces |
+| `bent(dir, side)` | Straw bent 90°; the long piece stands against the wall on side `dir` |
+| `straight(dir, head, side)` | Unbent straw leaning on the rim on side `dir`; `head` is `'up'` or `'down'` |
+| `side` | When two straws share a diameter, which half of it this one takes (+1 / −1) |
 
-## 文件结构
+## Files
 
 ```
-index.html            搭建台本体（three.js r128 + OrbitControls）
-vendor/               three.js 与 OrbitControls 的本地副本（MIT）
-img/                  实拍照片：g1–g6 为第一轮，r2g1–r2g4 为第二轮，各含 _front/_side/_top
-design/               第二轮第 5、6 组的设计三视图（题目卡 + 搭建对照）
-dist/                 单文件离线版
-tools/build_offline.py  生成离线版的脚本
+index.html              the builder (three.js r128 + OrbitControls)
+vendor/                 local copies of three.js and OrbitControls (MIT)
+img/                    photos: g1–g6 are round 1, r2g1–r2g4 are round 2, each with _front/_side/_top
+design/                 view sheets for round 2, groups 5 and 6 (puzzle card + answer key)
+dist/                   single-file offline version
+tools/build_offline.py  script that builds the offline version
 ```
 
-## 致谢
+## Credits
 
-活动设计和实拍照片来自心理活动课第七组。3D 建模和搭建工具与 Claude 一起完成。
+Activity design and photos by Group 7 of the psychology activity class. 3D modelling and the builder were made together with Claude.
