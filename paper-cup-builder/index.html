@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>纸杯搭建台</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&family=Noto+Serif+SC:wght@700&display=swap">
+<style>
+/* Layout: a workbench — tool rail and live 3D stage on the left, the three drafting views (and the real photos) pinned on the right. Classroom palette: grey desk, blue chair, paper-cup ivory, black straw. */
+:root {
+  --bg: #eceeed;
+  --surface: #ffffff;
+  --fg: #1c2225;
+  --muted: #5b6569;
+  --line: #d3d8d9;
+  --accent: #2b67a8;
+  --accent-soft: #e2ecf7;
+  --warm: #c06f27;
+  --warm-soft: #f8eadc;
+  --green: #2f7d4f;
+  --green-soft: #e0f0e6;
+  --scene-bg: #e3e7e7;
+  --floor: #c9cfd0;
+  --font-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-display: "Noto Serif SC", "Songti SC", "SimSun", serif;
+  --radius: 10px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14181a; --surface: #1d2225; --fg: #e4e8e8; --muted: #98a3a7; --line: #323a3e;
+    --accent: #7db0e8; --accent-soft: #1f3247; --warm: #e5a262; --warm-soft: #3a2a1b;
+    --green: #7fcf9e; --green-soft: #1c3226;
+    --scene-bg: #20262a; --floor: #2a3034; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14181a; --surface: #1d2225; --fg: #e4e8e8; --muted: #98a3a7; --line: #323a3e;
+  --accent: #7db0e8; --accent-soft: #1f3247; --warm: #e5a262; --warm-soft: #3a2a1b;
+  --green: #7fcf9e; --green-soft: #1c3226;
+  --scene-bg: #20262a; --floor: #2a3034; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6; }
+.wrap { max-width: 1240px; margin: 0 auto; padding-inline: 20px; padding-block: 24px 48px; display: grid; gap: 16px; }
+header { display: grid; gap: 4px; }
+h1 { font-family: var(--font-display); font-size: clamp(26px, 4vw, 34px); line-height: 1.2; margin: 0; letter-spacing: 0.02em; text-wrap: balance; }
+.sub { color: var(--muted); margin: 0; max-width: 66ch; }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+select, .btn { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); border-radius: 8px; padding: 6px 12px; }
+.btn { cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.count { margin-left: auto; color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.count b { color: var(--fg); }
+.bench { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.stage { position: relative; aspect-ratio: 4 / 3; max-width: 100%; background: var(--scene-bg); touch-action: none; cursor: crosshair; }
+.stage canvas { display: block; width: 100%; height: 100%; }
+.toast { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: var(--fg); color: var(--surface); font-size: 13px; padding: 5px 12px; border-radius: 999px; pointer-events: none; opacity: 0; transition: opacity .2s; white-space: nowrap; max-width: 92%; overflow: hidden; text-overflow: ellipsis; }
+.toast.on { opacity: 0.92; }
+.hint { position: absolute; left: 12px; bottom: 8px; font-size: 12px; color: var(--muted); pointer-events: none; }
+.tools { display: grid; gap: 10px; padding: 12px 14px; border-top: 1px solid var(--line); }
+.row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.row .lab { font-size: 12px; color: var(--muted); letter-spacing: 0.06em; min-width: 3.5em; }
+.seg { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 6px; padding: 5px 11px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+.seg kbd { font-family: inherit; font-size: 11px; color: var(--muted); }
+.seg[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 500; }
+.seg[aria-pressed="true"] kbd { color: var(--accent); }
+.seg:focus-visible, .btn:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.side { display: grid; gap: 12px; }
+.views { padding: 12px; display: grid; gap: 8px; }
+.views h2, .photos h2, .note h2 { font-size: 13px; letter-spacing: 0.08em; color: var(--muted); font-weight: 500; margin: 0; }
+.vgrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.vcell { display: grid; gap: 2px; }
+.vcell canvas { width: 100%; aspect-ratio: 4 / 3; border-radius: 6px; background: var(--scene-bg); display: block; }
+.vcell span { font-size: 13px; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; }
+.vcell button { font: inherit; font-size: 12px; border: none; background: none; color: var(--accent); cursor: pointer; padding: 0; }
+.photos { padding: 12px; display: grid; gap: 8px; }
+.pgrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.pgrid figure { margin: 0; display: grid; gap: 2px; }
+.pgrid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 6px; display: block; background: var(--scene-bg); }
+.pgrid figcaption { font-size: 12px; color: var(--muted); }
+.note { padding: 12px 14px; display: grid; gap: 6px; }
+.note p { margin: 0; font-size: 14px; max-width: 70ch; }
+.note .hidden-cup { border-left: 3px solid var(--warm); background: var(--warm-soft); padding: 8px 12px; border-radius: 0 8px 8px 0; }
+.note .design { border-left: 3px solid var(--green); background: var(--green-soft); padding: 8px 12px; border-radius: 0 8px 8px 0; }
+details.code { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
+details.code summary { cursor: pointer; font-weight: 500; }
+details.code textarea { width: 100%; min-height: 110px; margin-top: 10px; font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace; background: var(--bg); color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; resize: vertical; }
+.undo-tip { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+.undo-tip b { color: var(--ink, inherit); }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+.fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 20px; text-align: center; color: var(--muted); }
+.fallback[hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>纸杯搭建台</h1>
+    <p class="sub">载入两轮活动二的目标结构，或者自己搭一个新的。点桌面放杯，点杯顶叠层；拖动旋转视角。右侧三视图随时更新，可以直接拿来出题。</p>
+  </header>
+
+  <div class="bar">
+    <select id="preset" aria-label="选择结构"></select>
+    <button class="btn" id="btn-new">新建空白</button>
+    <button class="btn" id="btn-undo" disabled>撤销</button>
+    <span class="count" id="count"></span>
+  </div>
+
+  <div class="bench">
+    <section class="panel" aria-label="搭建区">
+      <div class="stage" id="stage">
+        <div class="fallback" id="fallback" hidden>3D 画面加载失败，请检查网络后刷新。</div>
+        <div class="toast" id="toast" role="status"></div>
+        <span class="hint">左键放置 · 右键拿走 · 拖动旋转 · 滚轮缩放</span>
+      </div>
+      <div class="tools">
+        <div class="row" role="group" aria-label="工具">
+          <span class="lab">工具</span>
+          <button class="seg" data-tool="up" id="t-up">正放 <kbd>1</kbd></button>
+          <button class="seg" data-tool="down" id="t-down">倒扣 <kbd>2</kbd></button>
+          <button class="seg" data-tool="side" id="t-side">侧放 <kbd>3</kbd></button>
+          <button class="seg" data-tool="straw" id="t-straw">吸管 <kbd>4</kbd></button>
+          <button class="seg" data-tool="erase" id="t-erase">拿走 <kbd>5</kbd></button>
+        </div>
+        <div class="row" role="group" aria-label="朝向" id="dirrow">
+          <span class="lab">朝向</span>
+          <button class="seg" data-dir="front" id="d-front">朝前</button>
+          <button class="seg" data-dir="back" id="d-back">朝后</button>
+          <button class="seg" data-dir="left" id="d-left">朝左</button>
+          <button class="seg" data-dir="right" id="d-right">朝右</button>
+          <span class="lab" style="min-width:auto">R 键轮换</span>
+        </div>
+        <div class="row" role="group" aria-label="吸管角度" id="tiltrow">
+          <span class="lab">吸管</span>
+          <button class="seg" data-stype="bent" id="s-bent">90°折弯</button>
+          <button class="seg" data-stype="up" id="s-up">直插·头朝上</button>
+          <button class="seg" data-stype="down" id="s-down">直插·头朝下</button>
+          <span class="lab" style="min-width:auto" id="stype-hint"></span>
+        </div>
+        <p class="undo-tip">放错了？点上方「撤销」或按 Ctrl+Z 退回上一步。要拔吸管、拿走杯：选「拿走」工具点它，或直接<b>右键</b>点它，一次拿掉一样（先拔吸管，再拿最上层的杯）。</p>
+        <div class="legend"><span><i style="background:#b4d0f0"></i>正放</span><span><i style="background:#f5cfa6"></i>倒扣</span><span><i style="background:#bfe3c9"></i>侧放</span><span>（颜色可在右上切换为原色）</span></div>
+      </div>
+    </section>
+
+    <div class="side">
+      <section class="panel views" aria-label="三视图">
+        <div class="row" style="justify-content:space-between">
+          <h2>三视图（正交投影）</h2>
+          <label class="lab" for="tint" style="display:inline-flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="tint" checked> 按朝向上色</label>
+        </div>
+        <div class="vgrid">
+          <div class="vcell"><canvas id="mv-front" width="480" height="360" aria-label="正视图"></canvas><span>正视</span></div>
+          <div class="vcell"><canvas id="mv-side" width="480" height="360" aria-label="侧视图"></canvas><span><span id="side-label">侧视（从右看）</span><button id="flip-side">换另一侧</button></span></div>
+          <div class="vcell"><canvas id="mv-top" width="480" height="360" aria-label="俯视图"></canvas><span>俯视</span></div>
+          <div class="vcell"><canvas id="mv-iso" width="480" height="360" aria-label="斜视图"></canvas><span>斜视</span></div>
+        </div>
+      </section>
+      <section class="panel photos" id="photos" aria-label="实拍照片">
+        <h2>实拍三视图</h2>
+        <div class="pgrid">
+          <figure><img id="ph-front" alt=""><figcaption>正视</figcaption></figure>
+          <figure><img id="ph-side" alt=""><figcaption>侧视</figcaption></figure>
+          <figure><img id="ph-top" alt=""><figcaption>俯视</figcaption></figure>
+        </div>
+      </section>
+      <section class="panel note" aria-live="polite">
+        <h2 id="note-title">说明</h2>
+        <p id="note-text"></p>
+      </section>
+    </div>
+  </div>
+
+  <details class="code">
+    <summary>方案代码（复制保存 / 粘贴载入）</summary>
+    <textarea id="code" spellcheck="false" aria-label="方案代码"></textarea>
+    <div class="row" style="margin-top:8px">
+      <button class="btn" id="btn-copy">复制代码</button>
+      <button class="btn" id="btn-load">载入上面的代码</button>
+    </div>
+  </details>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="vendor/OrbitControls.js"></script>
+<script>
+(function () {
+  // ---------------- preset data ----------------
+  // u,v: position in the top-view photo (u → right, v → down), in cup diameters.
+  // front: where the front-view camera stood in that photo (W/E/S); side: 'R' or 'L' of the front viewer.
+  // s: U 正放 · D 倒扣 · HG 沙漏(下倒扣上正放) · BR 腰鼓(下正放上倒扣) · S 侧放(open = 杯口方向)
+  var R1 = [
+    { front: 'W', side: 'R', cols: [[0,0,'D'],[1,0,'U'],[0,1,'HG'],[1,1,'BR'],[2,1,'D'],[1,2,'D'],[1,3,'D']],
+      hidden: '中间那摞腰鼓的下层杯三张图都拍不到，只能从上层倒扣杯在第二层高度反推它是正放。' },
+    { front: 'W', side: 'R', cols: [[0,0,'U'],[1,0,'HG'],[0,1,'HG'],[1,1,'U'],[0,2,'U'],[1,2,'U'],[1,3,'D']],
+      hidden: '右上角沙漏的下层杯三张图都拍不到，只能从上层正放杯在第二层高度反推它是倒扣。' },
+    { front: 'E', side: 'R', cols: [[0.3,0.3,'U'],[1.9,0,'BR'],[0.95,0.95,'HG'],[1.9,0.95,'D'],[0.3,1.6,'BR'],[1.9,1.9,'U']],
+      hidden: '左下腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' },
+    { front: 'W', side: 'R', cols: [[0,0,'D'],[0,0.95,'U'],[0,1.9,'D'],[0,2.85,'BR'],[1,1.9,'D'],[1.95,1,'U'],[1.9,-0.05,'BR']],
+      hidden: '右上腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' },
+    { front: 'S', side: 'R', cols: [[-1,0,'HG'],[0,0,'U'],[1,0,'D'],[1.95,0,'U'],[0,-0.97,'BR'],[1.02,-0.97,'HG']],
+      hidden: '后排左边腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' },
+    { front: 'S', side: 'R', cols: [[0,0,'U'],[1,0,'D'],[1.95,0,'U'],[0,-1,'HG'],[1,-1,'HG'],[0,-2,'HG']],
+      hidden: '中排左边沙漏的下层杯三张图都拍不到，只能从高度反推它是倒扣。' }
+  ];
+  // round 2: items {u,v,s,open,straws:[...]}
+  // Two ways a straw sits in a cup (all lengths in cm, directions in top-photo coordinates):
+  //   bent(d):          bent 90°, short piece lying flat on the floor, long piece standing straight up
+  //                     against the wall on side d (so it is NOT in the middle of the cup)
+  //   straight(d, head): not bent, foot on the floor at the wall opposite d, leaning on the rim on side d;
+  //                     head = 'up' (short end with the bellows at the top) or 'down' (short end on the floor)
+  // Straws only run front-back or left-right (orthogonal), along a diameter of the cup floor.
+  // Two straws on the same diameter lie side by side with an empty gap running exactly along that
+  // diameter; `side` (+1/-1, toward +v or +u in the photo) says which half each one takes.
+  function it(u, v, s, extra) { var o = { u: u, v: v, s: s }; for (var k in extra) o[k] = extra[k]; return o; }
+  function bent(d, side) { return { kind: 'bent', dir: d, side: side }; }
+  function straight(d, head, side) { return { kind: 'straight', dir: d, head: head, side: side }; }
+  var R2 = [
+    { front: 'E', side: 'L', items: [
+      it(-1,-1,'D'), it(0,-1,'U',{straws:[bent([0,-1])]}), it(-1,0,'S',{open:[0,1]}), it(0,0,'BR'),
+      it(1.05,0,'S',{open:[1,0]}), it(0,1.05,'U',{straws:[bent([0,1])]}) ],
+      text: '中间腰鼓的下层杯三张图都拍不到。注意这一组的侧视照片是从正视的左手边拍的，和其他组相反。' },
+    { front: 'W', side: 'R', items: [
+      it(0,-1.95,'S',{open:[0,-1]}), it(0,-0.95,'D'), it(-0.95,0,'HG'), it(0,0,'U',{straws:[bent([1,0])]}),
+      it(1.05,0,'S',{open:[1,0]}), it(0,1.1,'U',{straws:[bent([-1,0])]}) ],
+      text: '沙漏两层在正视里都能看到。两根吸管都是 90° 折弯：短段平躺杯底，长段贴着杯壁竖直立起，所以长段不在杯子正中，两根分别贴在相反的两侧。' },
+    { front: 'W', side: 'R', items: [
+      it(0,-0.9,'U',{straws:[straight([1,0],'up')]}), it(-1,0,'D'), it(0,0,'D'), it(1.1,0,'S',{open:[1,0]}),
+      it(-1,1.0,'S',{open:[0,1]}), it(0,1.1,'U',{straws:[bent([-1,0])]}), it(1,1.15,'D') ],
+      text: '7 只杯全是单层，没有叠放。上方杯的吸管没有折弯，头朝上（折弯段在上），斜靠在杯沿上；下方杯的吸管 90° 折弯，短段平躺杯底，长段贴着靠正视一侧的杯壁竖起。' },
+    { front: 'W', side: 'R', items: [
+      it(0,-1.95,'D'), it(-0.05,-1.0,'S',{open:[-1,0]}), it(1.0,-1.05,'BR'), it(-1,0,'D'), it(0,0,'U'),
+      it(1,0,'U',{straws:[bent([-1,0],1), straight([1,0],'down',-1)]}) ],
+      text: '右下那只杯插了两根吸管：一根 90° 折弯，长段贴着靠正视一侧的杯壁竖起；另一根没有折弯，头朝下（折弯段在杯底），斜靠在后侧杯沿上。两根沿同一条直径并排，中间留一条沿直径的缝。右上腰鼓的下层杯三张图都拍不到，只能从高度反推它是正放。' }
+  ];
+  // round 2 designed groups, already in world convention (u = X right, v = Z toward front viewer)
+  var R2D = [
+    { front: 'S', side: 'R', designed: true, items: [
+      it(0,0,'HG',{straws:[bent([1,0])]}), it(1,0,'D'), it(2,0.04,'S',{open:[0,1]}), it(-1.05,0,'S',{open:[-1,0]}),
+      it(0,1.05,'D'), it(1,1.05,'U',{straws:[straight([0,-1],'up')]}) ],
+      text: '设计组。正视里中间看起来像一个沙漏，其实下半截是前排一只单独的倒扣杯，真正的沙漏在它后面，俯视才能看出来。沙漏下层杯三张图都被挡住，只能从高度反推它是倒扣。' },
+    { front: 'S', side: 'R', designed: true, items: [
+      it(0,0,'BR'), it(1,0,'U',{straws:[straight([1,0],'down')]}), it(1.05,-1,'S',{open:[1,0]}),
+      it(-1,0,'U',{straws:[bent([0,1])]}), it(0,1.05,'D'), it(1,1.05,'S',{open:[0,1]}) ],
+      text: '设计组。正视里中间像是两只倒扣杯叠在一起，但同向会套进去，说明上面那只在后排，是腰鼓的上层。右边正放杯的吸管没有折弯，头朝下斜靠在右侧杯沿上：侧视里它正对镜头方向倾斜，看起来是竖直的，只有正视能看出它斜着。腰鼓下层杯三张图都看不到，只能反推它是正放。' }
+  ];
+
+  function toWorld(front, u, v) {
+    if (front === 'W') return [v, -u];
+    if (front === 'E') return [-v, u];
+    return [u, v];
+  }
+  function dirWorld(front, d) { var w = toWorld(front, d[0], d[1]); var l = Math.hypot(w[0], w[1]) || 1; return [w[0] / l, w[1] / l]; }
+  function photoUp(front) {
+    if (front === 'W') return [-1, 0];
+    if (front === 'E') return [1, 0];
+    return [0, -1];
+  }
+  var STACK = { U: ['up'], D: ['down'], HG: ['down', 'up'], BR: ['up', 'down'] };
+
+  function convert(p) {
+    var items = [];
+    var src = p.cols ? p.cols.map(function (c) { return { u: c[0], v: c[1], s: c[2] }; }) : p.items;
+    src.forEach(function (c) {
+      var w = toWorld(p.front, c.u, c.v);
+      var straws = (c.straws || []).map(function (s) {
+        var o = { kind: s.kind, dir: dirWorld(p.front, s.dir) };
+        if (s.head) o.head = s.head;
+        if (s.side) { var n = toWorld(p.front, Math.abs(s.dir[1]) > 0.5 ? s.side : 0, Math.abs(s.dir[1]) > 0.5 ? 0 : s.side); o.side = n; }
+        return o;
+      });
+      if (c.s === 'S') items.push({ kind: 'side', x: w[0], z: w[1], dir: dirWorld(p.front, c.open), straws: straws });
+      else items.push({ kind: 'col', x: w[0], z: w[1], cups: STACK[c.s].slice(), straws: straws });
+    });
+    return { items: items, side: p.side, topUp: photoUp(p.front) };
+  }
+
+  var PRESETS = [];
+  R1.forEach(function (p, i) { PRESETS.push({ id: 'r1g' + (i + 1), label: '第一轮 · 第 ' + (i + 1) + ' 组', photos: 'img/g' + (i + 1) + '_', note: '三张图都拍不到的杯：' + p.hidden, data: convert(p) }); });
+  R2.forEach(function (p, i) { PRESETS.push({ id: 'r2g' + (i + 1), label: '第二轮 · 第 ' + (i + 1) + ' 组', photos: 'img/r2g' + (i + 1) + '_', note: p.text, data: convert(p) }); });
+  R2D.forEach(function (p, i) { PRESETS.push({ id: 'r2g' + (i + 5), label: '第二轮 · 第 ' + (i + 5) + ' 组（设计）', photos: null, note: p.text, designed: true, data: convert(p) }); });
+
+  // ---------------- UI wiring ----------------
+  var sel = document.getElementById('preset');
+  var g1 = document.createElement('optgroup'); g1.label = '第一轮';
+  var g2 = document.createElement('optgroup'); g2.label = '第二轮（可侧放、带吸管）';
+  var g3 = document.createElement('optgroup'); g3.label = '我的搭建';
+  PRESETS.forEach(function (p, i) { var o = document.createElement('option'); o.value = p.id; o.textContent = p.label; (p.id.indexOf('r1') === 0 ? g1 : g2).appendChild(o); });
+  var oc = document.createElement('option'); oc.value = 'custom'; oc.textContent = '自由搭建'; g3.appendChild(oc);
+  sel.appendChild(g1); sel.appendChild(g2); sel.appendChild(g3);
+
+  var state = { items: [], side: 'R', topUp: [0, -1] };
+  var presetId = 'r2g1', tool = 'up', dirKey = 'front', stype = 'bent', tint = true;
+  var undoStack = [];
+  var DIRS = { front: [0, 1], back: [0, -1], left: [-1, 0], right: [1, 0] };
+  var DIR_ORDER = ['front', 'right', 'back', 'left'];
+
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function toast(msg) {
+    var t = document.getElementById('toast'); t.textContent = msg; t.classList.add('on');
+    clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('on'); }, 1800);
+  }
+  function persist() {
+    try { localStorage.setItem('cupbuild', JSON.stringify({ preset: presetId, state: state })); } catch (e) {}
+    document.getElementById('code').value = JSON.stringify(state);
+  }
+  function pushUndo() { undoStack.push(JSON.stringify({ preset: presetId, state: state })); if (undoStack.length > 80) undoStack.shift(); document.getElementById('btn-undo').disabled = false; }
+
+  function counts() {
+    var cups = 0, straws = 0;
+    state.items.forEach(function (i) { cups += i.kind === 'col' ? i.cups.length : 1; straws += (i.straws || []).length; });
+    document.getElementById('count').innerHTML = '<b>' + cups + '</b> 只杯 · <b>' + straws + '</b> 根吸管';
+  }
+
+  function renderInfo() {
+    var p = PRESETS.filter(function (x) { return x.id === presetId; })[0];
+    var photos = document.getElementById('photos');
+    if (p && p.photos) {
+      photos.hidden = false;
+      ['front', 'side', 'top'].forEach(function (v) {
+        var img = document.getElementById('ph-' + v); img.src = p.photos + v + '.jpg'; img.alt = p.label + ' ' + v + ' 照片';
+      });
+    } else photos.hidden = true;
+    var title = document.getElementById('note-title'), text = document.getElementById('note-text');
+    if (p) {
+      title.textContent = p.label;
+      text.className = p.designed ? 'design' : 'hidden-cup';
+      text.textContent = p.note + (p.designed ? ' 摆好后照右侧三视图的方向拍照即可。' : '');
+    } else {
+      title.textContent = '自由搭建';
+      text.className = '';
+      text.textContent = '摆放规则：每只杯（或每一叠）至少要和一只杯挨着。正放杯上面只能倒扣（口对口成腰鼓），倒扣杯上面只能正放（底对底成沙漏），同向会套进去，最多叠三层。侧放杯和插了吸管的杯上面不能再叠。吸管只插在最上层是正放的杯里：要么 90° 折弯贴壁竖起，要么不折弯斜靠杯沿（头朝上或头朝下）；只能前后或左右摆，沿杯底直径。两根用同一条直径时并排放，中间留一条正好沿直径的缝。';
+    }
+    document.getElementById('side-label').textContent = '侧视（从' + (state.side === 'L' ? '左' : '右') + '看）';
+    sel.value = p ? p.id : 'custom';
+  }
+
+  function syncTools() {
+    document.querySelectorAll('[data-tool]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.tool === tool)); });
+    document.querySelectorAll('[data-dir]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.dir === dirKey)); });
+    document.querySelectorAll('[data-stype]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.stype === stype)); });
+    document.getElementById('dirrow').hidden = !(tool === 'side' || tool === 'straw');
+    document.getElementById('tiltrow').hidden = tool !== 'straw';
+    document.getElementById('stype-hint').textContent = {
+      bent: '短段平躺杯底，长段贴着“朝向”那侧的杯壁竖直立起',
+      up: '不折弯，折弯段在上，斜靠在“朝向”那侧的杯沿',
+      down: '不折弯，折弯段抵住杯底，斜靠在“朝向”那侧的杯沿' }[stype];
+  }
+  document.querySelectorAll('[data-tool]').forEach(function (b) { b.addEventListener('click', function () { tool = b.dataset.tool; syncTools(); if (api) api.updateGhost(); }); });
+  document.querySelectorAll('[data-dir]').forEach(function (b) { b.addEventListener('click', function () { dirKey = b.dataset.dir; syncTools(); if (api) api.updateGhost(); }); });
+  document.querySelectorAll('[data-stype]').forEach(function (b) { b.addEventListener('click', function () { stype = b.dataset.stype; syncTools(); }); });
+  document.getElementById('tint').addEventListener('change', function (e) { tint = e.target.checked; if (api) api.rebuild(); });
+  document.getElementById('flip-side').addEventListener('click', function () { state.side = state.side === 'L' ? 'R' : 'L'; renderInfo(); persist(); if (api) api.renderViews(); });
+
+  function loadPreset(id, record) {
+    if (record) pushUndo();
+    if (id === 'custom') { presetId = 'custom'; }
+    else { var p = PRESETS.filter(function (x) { return x.id === id; })[0]; if (!p) return; presetId = id; state = clone(p.data); }
+    afterChange(true);
+  }
+  sel.addEventListener('change', function () { if (sel.value === 'custom') { presetId = 'custom'; renderInfo(); persist(); return; } loadPreset(sel.value, true); });
+  document.getElementById('btn-new').addEventListener('click', function () { pushUndo(); presetId = 'custom'; state = { items: [], side: 'R', topUp: [0, -1] }; afterChange(true); });
+  document.getElementById('btn-undo').addEventListener('click', undo);
+  function undo() {
+    if (!undoStack.length) return;
+    var s = JSON.parse(undoStack.pop()); presetId = s.preset; state = s.state;
+    document.getElementById('btn-undo').disabled = !undoStack.length; afterChange(false);
+  }
+  document.getElementById('btn-copy').addEventListener('click', function () {
+    var ta = document.getElementById('code'); ta.value = JSON.stringify(state);
+    var done = function () { toast('已复制方案代码'); };
+    try { navigator.clipboard.writeText(ta.value).then(done, function () { ta.select(); toast('已选中代码，请手动复制'); }); } catch (e) { ta.select(); toast('已选中代码，请手动复制'); }
+  });
+  document.getElementById('btn-load').addEventListener('click', function () {
+    try {
+      var s = JSON.parse(document.getElementById('code').value);
+      if (!s || !Array.isArray(s.items)) throw new Error('bad');
+      pushUndo(); presetId = 'custom'; state = { items: s.items, side: s.side === 'L' ? 'L' : 'R', topUp: Array.isArray(s.topUp) ? s.topUp : [0, -1] };
+      afterChange(true);
+      var lone = window.__cupTool && window.__cupTool.isolated ? window.__cupTool.isolated().length : 0;
+      toast(lone ? '已载入方案，但有 ' + lone + ' 处杯没挨着其他杯' : '已载入方案');
+    } catch (e) { toast('代码格式不对，请粘贴从这里复制出来的完整代码'); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.target && (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT')) return;
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); undo(); return; }
+    var map = { '1': 'up', '2': 'down', '3': 'side', '4': 'straw', '5': 'erase' };
+    if (map[e.key]) { tool = map[e.key]; syncTools(); if (api) api.updateGhost(); }
+    if (e.key === 'r' || e.key === 'R') { dirKey = DIR_ORDER[(DIR_ORDER.indexOf(dirKey) + 1) % 4]; syncTools(); if (api) api.updateGhost(); }
+  });
+
+  var api = null;
+  function afterChange(refit) { counts(); renderInfo(); persist(); if (api) { api.rebuild(); if (refit) api.fit(); } }
+
+  // restore
+  try {
+    var saved = JSON.parse(localStorage.getItem('cupbuild') || 'null');
+    var known = saved && PRESETS.filter(function (x) { return x.id === saved.preset; })[0];
+    if (known) { presetId = known.id; state = clone(known.data); }
+    else if (saved && saved.state && Array.isArray(saved.state.items)) { presetId = 'custom'; state = saved.state; }
+    else state = clone(PRESETS.filter(function (x) { return x.id === presetId; })[0].data);
+  } catch (e) { state = clone(PRESETS.filter(function (x) { return x.id === presetId; })[0].data); }
+  var hm = /^#(r[12]g[1-6])$/.exec(location.hash || '');
+  if (hm) { presetId = hm[1]; state = clone(PRESETS.filter(function (x) { return x.id === presetId; })[0].data); }
+  syncTools(); counts(); renderInfo(); persist();
+
+  if (typeof THREE === 'undefined' || !THREE.OrbitControls) { document.getElementById('fallback').hidden = false; return; }
+
+  // ---------------- 3D ----------------
+  var RT = 3.75, RB = 2.65, H = 8.2, DIA = 7.6, STRAW_R = 0.3, LONG = 15.2, SHORT = 4.6, BELLOWS = 1.3;
+  var PHI = Math.atan(H / (RT - RB));      // tilt that lays a cup on its side
+  var stage = document.getElementById('stage');
+  var renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  stage.insertBefore(renderer.domElement, stage.firstChild);
+  var mini = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+  mini.setPixelRatio(1); mini.setSize(960, 720, false);
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(32, 4 / 3, 1, 3000);
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.12;
+  controls.maxPolarAngle = Math.PI / 2 - 0.03; controls.minDistance = 25; controls.maxDistance = 320;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa3a6, 0.85));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.5);
+  sun.position.set(-30, 130, 45); sun.castShadow = true; sun.shadow.mapSize.set(1024, 1024); sun.shadow.radius = 4;
+  var sc = sun.shadow.camera; sc.left = -60; sc.right = 60; sc.top = 60; sc.bottom = -60; sc.near = 10; sc.far = 300;
+  scene.add(sun);
+  var fill = new THREE.DirectionalLight(0xffffff, 0.18); fill.position.set(60, 30, -40); scene.add(fill);
+
+  var floorMat = new THREE.MeshStandardMaterial({ roughness: 0.95 });
+  var floor = new THREE.Mesh(new THREE.BoxGeometry(600, 0.4, 600), floorMat);
+  floor.position.y = -0.2; floor.receiveShadow = true; scene.add(floor);
+  var grid = new THREE.GridHelper(DIA * 16, 32, 0x8f9a9e, 0xaab3b6);
+  grid.material.transparent = true; grid.material.opacity = 0.35; grid.position.y = 0.02; scene.add(grid);
+
+  var M = {
+    paper: new THREE.MeshStandardMaterial({ color: 0xfbfaf6, roughness: 0.85 }),
+    inside: new THREE.MeshStandardMaterial({ color: 0xf0e4c8, roughness: 0.9, side: THREE.BackSide }),
+    insideFloor: new THREE.MeshStandardMaterial({ color: 0xf1e6cc, roughness: 0.9 }),
+    rim: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.6 }),
+    up: new THREE.MeshStandardMaterial({ color: 0xb4d0f0, roughness: 0.8 }),
+    down: new THREE.MeshStandardMaterial({ color: 0xf5cfa6, roughness: 0.8 }),
+    side: new THREE.MeshStandardMaterial({ color: 0xbfe3c9, roughness: 0.8 }),
+    straw: new THREE.MeshStandardMaterial({ color: 0x1b1d1f, roughness: 0.5 }),
+    bellows: new THREE.MeshStandardMaterial({ color: 0x8d949a, roughness: 0.3, metalness: 0.4 }),
+    hover: new THREE.MeshStandardMaterial({ color: 0xe57373, roughness: 0.7 }),
+    ghost: new THREE.MeshStandardMaterial({ color: 0x2b67a8, transparent: true, opacity: 0.35, depthWrite: false }),
+    ghostBad: new THREE.MeshStandardMaterial({ color: 0xc0392b, transparent: true, opacity: 0.3, depthWrite: false })
+  };
+  var G = {
+    wall: new THREE.CylinderGeometry(RT, RB, H, 48, 1, true),
+    base: new THREE.CircleGeometry(RB - 0.02, 40),
+    rim: new THREE.TorusGeometry(RT, 0.14, 8, 48),
+    straw: new THREE.CylinderGeometry(STRAW_R, STRAW_R, 1, 12),
+    bellows: new THREE.CylinderGeometry(STRAW_R * 1.12, STRAW_R * 1.12, 1, 12),
+    joint: new THREE.SphereGeometry(STRAW_R * 1.15, 12, 8)
+  };
+
+  // a cup with base at local origin, opening toward +Y
+  function cupMesh(kind, ghostMat, tag) {
+    var g = new THREE.Group();
+    var outerMat = ghostMat || (tint ? M[kind] : M.paper);
+    var outer = new THREE.Mesh(G.wall, outerMat); outer.position.y = H / 2;
+    if (!ghostMat) { outer.castShadow = true; outer.receiveShadow = true; }
+    var parts = [outer];
+    if (!ghostMat) {
+      var inner = new THREE.Mesh(G.wall, M.inside); inner.position.y = H / 2; inner.scale.set(0.985, 1, 0.985);
+      var bi = new THREE.Mesh(G.base, M.insideFloor); bi.rotation.x = -Math.PI / 2; bi.position.y = 0.45;
+      var bo = new THREE.Mesh(G.base, outerMat); bo.rotation.x = Math.PI / 2; bo.position.y = 0.02;
+      var rim = new THREE.Mesh(G.rim, M.rim); rim.rotation.x = Math.PI / 2; rim.position.y = H; rim.castShadow = true;
+      parts.push(inner, bi, bo, rim);
+    }
+    parts.forEach(function (m) { if (tag) m.userData = tag; g.add(m); });
+    return g;
+  }
+  function placeUprightCup(parent, orient, level, x, z, ghostMat, tag) {
+    var c = cupMesh(orient === 'up' ? 'up' : 'down', ghostMat, tag);
+    if (orient === 'down') { c.rotation.x = Math.PI; c.position.set(x, level * H + H, z); }
+    else c.position.set(x, level * H, z);
+    parent.add(c);
+  }
+  function sideGroup(dir, ghostMat, tag) {
+    // opening toward world (dir[0], dir[1]) in XZ; footprint centred on origin
+    var outer = new THREE.Group(), inner = new THREE.Group();
+    var c = cupMesh('side', ghostMat, tag);
+    c.rotation.z = PHI;                       // opening → -X, rim end lifted
+    inner.add(c);
+    inner.position.set(H * Math.sin(PHI) / 2, RB * Math.sin(PHI), 0);
+    outer.add(inner);
+    outer.rotation.y = Math.atan2(dir[1], -dir[0]);
+    return outer;
+  }
+  // one straight piece of straw from point p along unit vector d for length len
+  function seg(group, p, d, len, mat, geo, tag) {
+    var v = new THREE.Vector3(d[0], d[1], d[2]).normalize();
+    var m = new THREE.Mesh(geo || G.straw, mat || M.straw);
+    m.scale.set(1, len, 1);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v);
+    m.position.set(p[0] + v.x * len / 2, p[1] + v.y * len / 2, p[2] + v.z * len / 2);
+    m.castShadow = true; if (tag) m.userData = tag;
+    group.add(m);
+    return [p[0] + v.x * len, p[1] + v.y * len, p[2] + v.z * len];
+  }
+  function norm2(d) { var l = Math.hypot(d[0], d[1]) || 1; return [d[0] / l, d[1] / l]; }
+  // tilt (radians from vertical) at which a straw leaving the bend along azimuth td comes to rest on the rim
+  function rimTilt(b, cx, cz, rimY, td) {
+    var R = RT - STRAW_R * 1.5, px = b[0] - cx, pz = b[2] - cz;
+    var k = px * td[0] + pz * td[1], c = px * px + pz * pz - R * R;
+    var sd = -k + Math.sqrt(Math.max(0, k * k - c));
+    return Math.atan2(sd, Math.max(0.5, rimY - b[1]));
+  }
+  // normalise straws saved by older versions of the page
+  function strawSpec(s) {
+    if (s.kind) return s;
+    if (s.type === 'lean') return { kind: 'straight', dir: s.dir, head: s.short === 'bottom' ? 'down' : 'up' };
+    if (s.type === 'bent') return { kind: 'bent', dir: s.dir };
+    if (s.rise > 0) return { kind: 'straight', dir: s.dir, head: 'down', off: s.off };
+    if (s.dir && s.tdir && s.dir[0] * s.tdir[0] + s.dir[1] * s.tdir[1] < 0) return { kind: 'straight', dir: s.tdir, head: 'down', off: s.off };
+    return s.dir ? { kind: 'bent', dir: s.dir, off: s.off } : null;
+  }
+  // straws only run along the table's two axes
+  function axisDir(d) { return Math.abs(d[0]) >= Math.abs(d[1]) ? [d[0] < 0 ? -1 : 1, 0] : [0, d[1] < 0 ? -1 : 1]; }
+  var PAIR_OFF = STRAW_R + 0.25;   // two straws on one diameter: centres 0.55 cm either side → 0.5 cm gap along the diameter
+  // work out where each straw of one cup goes: same diameter → side by side; crossing diameters → second one rests on the first
+  function layoutStraws(list) {
+    var specs = (list || []).map(strawSpec).filter(Boolean).map(function (o) {
+      var c = {}; for (var k in o) c[k] = o[k]; c.dir = axisDir(o.dir); c._off = [0, 0]; c._lift = 0; return c; });
+    if (specs.length === 2) {
+      var a = specs[0], b = specs[1];
+      if (Math.abs(a.dir[0] * b.dir[1] - a.dir[1] * b.dir[0]) < 0.5) {
+        var n = a.side ? norm2(a.side) : b.side ? [-b.side[0], -b.side[1]] : [-a.dir[1], a.dir[0]];
+        a._off = [n[0] * PAIR_OFF, n[1] * PAIR_OFF]; b._off = [-n[0] * PAIR_OFF, -n[1] * PAIR_OFF];
+      } else b._lift = 2 * STRAW_R;
+    }
+    return specs;
+  }
+  // straw in an upright cup whose inner floor is at height y (s comes from layoutStraws)
+  function cupStraw(group, x, y, z, s, tag) {
+    if (!s) return;
+    var dir = s.dir, off = s._off || [0, 0], rimY = y - 0.45 + H; y += s._lift || 0;
+    if (s.kind === 'bent') {
+      // 90° bend at the wall on side `dir`: short piece flat across the floor, long piece straight up
+      var b = [x + off[0] + dir[0] * 2.0, y + STRAW_R, z + off[1] + dir[1] * 2.0];
+      seg(group, b, [-dir[0], 0, -dir[1]], SHORT - 0.4, M.straw, null, tag);
+      var j = new THREE.Mesh(G.joint, M.bellows); j.position.set(b[0], b[1], b[2]); if (tag) j.userData = tag; group.add(j);
+      var p = seg(group, b, [0, 1, 0], BELLOWS, M.bellows, G.bellows, tag);
+      seg(group, p, [0, 1, 0], LONG - BELLOWS, M.straw, null, tag);
+      return;
+    }
+    // straight straw: foot at the floor edge opposite `dir`, resting on the rim on side `dir`
+    var foot = [x + off[0] - dir[0] * 2.2, y + STRAW_R, z + off[1] - dir[1] * 2.2];
+    var t = rimTilt(foot, x, z, rimY, dir);
+    var d = [Math.sin(t) * dir[0], Math.cos(t), Math.sin(t) * dir[1]];
+    var first = s.head === 'down' ? SHORT : LONG - BELLOWS, second = s.head === 'down' ? LONG - BELLOWS : SHORT;
+    var q = seg(group, foot, d, first, M.straw, null, tag);
+    q = seg(group, q, d, BELLOWS, M.bellows, G.bellows, tag);
+    seg(group, q, d, second, M.straw, null, tag);
+  }
+  function itemHeight(item) { return item.kind === 'col' ? item.cups.length * H : 2 * RT * Math.cos(Math.atan((RT - RB) / H)); }
+
+  var model = new THREE.Group(); scene.add(model);
+  var ghost = new THREE.Group(); scene.add(ghost);
+
+  function buildInto(group, hoverIdx) {
+    while (group.children.length) group.remove(group.children[0]);
+    state.items.forEach(function (item, idx) {
+      var x = item.x * DIA, z = item.z * DIA, tag = { idx: idx };
+      var hov = idx === hoverIdx ? M.hover : null;
+      if (item.kind === 'col') {
+        item.cups.forEach(function (o, lv) {
+          var useHover = hov && lv === item.cups.length - 1;
+          placeUprightCup(group, o, lv, x, z, null, tag);
+          if (useHover) { var last = group.children[group.children.length - 1]; last.children[0].material = M.hover; }
+        });
+        var top = item.cups.length - 1, baseY = top * H + 0.45;
+        layoutStraws(item.straws).forEach(function (s) { cupStraw(group, x, baseY, z, s, tag); });
+      } else {
+        var sg = sideGroup(item.dir, null, tag); sg.position.set(x, 0, z); group.add(sg);
+        if (hov) sg.traverse(function (o) { if (o.isMesh && o.material === (tint ? M.side : M.paper)) o.material = M.hover; });
+      }
+    });
+  }
+
+  // ---------- views ----------
+  var center = new THREE.Vector3(), ext = 30;
+  function computeBounds() {
+    if (!state.items.length) { center.set(0, H, 0); ext = 34; return; }
+    var box = new THREE.Box3().setFromObject(model);
+    box.getCenter(center); var size = new THREE.Vector3(); box.getSize(size);
+    center.y = Math.max(H * 0.8, size.y / 2);
+    ext = Math.max(size.x, size.z, size.y) / 2 + 3.5;
+  }
+  function fit() {
+    computeBounds();
+    var d = Math.max(ext * 3.6, 80);
+    camera.position.set(center.x + d * 0.55, d * 0.65, center.z + d * 0.75);
+    controls.target.copy(center); controls.update();
+  }
+
+  var ortho = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 2000);
+  var persp = new THREE.PerspectiveCamera(30, 4 / 3, 1, 3000);
+  var miniCanvases = {};
+  ['front', 'side', 'top', 'iso'].forEach(function (k) { miniCanvases[k] = document.getElementById('mv-' + k).getContext('2d'); });
+
+  function setOrtho(view) {
+    var half = ext, aspect = 4 / 3;
+    ortho.left = -half * aspect; ortho.right = half * aspect;
+    if (view === 'top') {
+      ortho.top = half; ortho.bottom = -half;
+      var up = state.topUp || [0, -1];
+      ortho.up.set(up[0], 0, up[1]);
+      ortho.position.set(center.x, 500, center.z); ortho.lookAt(center.x, 0, center.z);
+    } else {
+      var cy = 0;                                  // camera at table height; table line sits near the bottom edge
+      ortho.bottom = -2.5; ortho.top = ortho.bottom + 2 * half;
+      ortho.up.set(0, 1, 0);
+      if (view === 'front') { ortho.position.set(center.x, cy, center.z + 500); ortho.lookAt(center.x, cy, center.z); }
+      else { var sx = state.side === 'L' ? -500 : 500; ortho.position.set(center.x + sx, cy, center.z); ortho.lookAt(center.x, cy, center.z); }
+    }
+    ortho.updateProjectionMatrix();
+  }
+  function renderViews() {
+    var bg = getComputedStyle(document.documentElement).getPropertyValue('--scene-bg').trim() || '#e3e7e7';
+    grid.visible = false; ghost.visible = false;
+    ['front', 'side', 'top'].forEach(function (v) {
+      setOrtho(v); mini.render(scene, ortho);
+      var ctx = miniCanvases[v]; ctx.fillStyle = bg; ctx.fillRect(0, 0, 480, 360); ctx.drawImage(mini.domElement, 0, 0, 480, 360);
+    });
+    var d = Math.max(ext * 3.4, 80);
+    persp.position.set(center.x + d * 0.55, d * 0.6, center.z + d * 0.75); persp.lookAt(center.x, center.y * 0.7, center.z); persp.aspect = 4 / 3; persp.updateProjectionMatrix();
+    mini.render(scene, persp); miniCanvases.iso.drawImage(mini.domElement, 0, 0, 480, 360);
+    grid.visible = true; ghost.visible = true;
+  }
+
+  function rebuild() { buildInto(model, hoverIdx); computeBounds(); renderViews(); }
+
+  // ---------- interaction ----------
+  var raycaster = new THREE.Raycaster(), pointer = new THREE.Vector2();
+  var hoverIdx = -1, ghostSpec = null, lastHit = null;
+  function snap(v) { return Math.round(v * 2) / 2; }
+  function itemAt(x, z) {
+    for (var i = 0; i < state.items.length; i++) { var it2 = state.items[i]; if (Math.hypot(it2.x - x, it2.z - z) < 0.45) return i; }
+    return -1;
+  }
+  function pick(ev) {
+    var r = renderer.domElement.getBoundingClientRect();
+    pointer.x = ((ev.clientX - r.left) / r.width) * 2 - 1; pointer.y = -((ev.clientY - r.top) / r.height) * 2 + 1;
+    raycaster.setFromCamera(pointer, camera);
+    var hits = raycaster.intersectObjects(model.children, true);
+    for (var i = 0; i < hits.length; i++) { var t = hits[i].object.userData; if (t && t.idx !== undefined) return { idx: t.idx }; }
+    var fh = raycaster.intersectObject(floor);
+    if (fh.length) { var p = fh[0].point; var x = snap(p.x / DIA), z = snap(p.z / DIA); var idx = itemAt(x, z); return idx >= 0 ? { idx: idx } : { x: x, z: z }; }
+    return null;
+  }
+  // top-view outline of an item as boundary sample points, in cup-diameter units
+  function outline(item) {
+    var pts = [], i;
+    if (item.kind === 'col') {
+      var r = RT / DIA;
+      for (i = 0; i < 32; i++) pts.push([item.x + r * Math.cos(i * Math.PI / 16), item.z + r * Math.sin(i * Math.PI / 16)]);
+      return pts;
+    }
+    var L = H * Math.sin(PHI) / 2 / DIA, wb = RB / DIA, wt = RT / DIA, d = item.dir, n = [-d[1], d[0]];
+    var poly = [[-L, -wb], [L, -wt], [L, wt], [-L, wb]];
+    for (var e = 0; e < 4; e++) {
+      var A = poly[e], B = poly[(e + 1) % 4];
+      for (i = 0; i < 8; i++) {
+        var t = i / 8, a = A[0] + (B[0] - A[0]) * t, b = A[1] + (B[1] - A[1]) * t;
+        pts.push([item.x + d[0] * a + n[0] * b, item.z + d[1] * a + n[1] * b]);
+      }
+    }
+    return pts;
+  }
+  // radius of a stack at height h (0 when the stack is lower than h)
+  function stackR(cups, h) {
+    var lv = Math.floor(h / H); if (lv >= cups.length) return 0;
+    var t = h / H - lv; return cups[lv] === 'up' ? RB + (RT - RB) * t : RT - (RT - RB) * t;
+  }
+  // free space between two items in cup diameters (negative = they would overlap)
+  function gap(p, q) {
+    if (p.kind === 'col' && q.kind === 'col') {
+      var reach = 0, top = Math.min(p.cups.length, q.cups.length) * H;
+      for (var h = 0; h <= top - 0.01; h += 0.1) reach = Math.max(reach, stackR(p.cups, h) + stackR(q.cups, h));
+      return Math.hypot(p.x - q.x, p.z - q.z) - reach / DIA;
+    }
+    var A = outline(p), B = outline(q), m = 1e9;
+    for (var i = 0; i < A.length; i++) for (var j = 0; j < B.length; j++) m = Math.min(m, Math.hypot(A[i][0] - B[j][0], A[i][1] - B[j][1]));
+    return m;
+  }
+  var NEAR = 0.2;   // up to ~1.5 cm apart still counts as "next to each other"
+  function hasNeighbour(item, items) {
+    for (var i = 0; i < items.length; i++) if (items[i] !== item && gap(item, items[i]) <= NEAR) return true;
+    return false;
+  }
+  function isolated(items) { return items.filter(function (x) { return items.length > 1 && !hasNeighbour(x, items); }); }
+  var LONELY = '每只杯至少要挨着一只杯，这里离其他杯太远';
+  function canStack(item, orient) {
+    if (item.kind !== 'col') return '侧放杯上面不能再叠';
+    if ((item.straws || []).length) return '插了吸管的杯上面不能再叠';
+    if (item.cups.length >= 3) return '最多叠三层';
+    if (item.cups[item.cups.length - 1] === orient) return '同向叠会套进去：正放上叠倒扣，倒扣上叠正放';
+    return '';
+  }
+  function evaluate(hit) {
+    // returns {ok, msg, ghost:{kind,...}, act:function}
+    if (!hit) return null;
+    var dir = DIRS[dirKey];
+    if (tool === 'up' || tool === 'down') {
+      if (hit.idx !== undefined) {
+        var item = state.items[hit.idx], why = canStack(item, tool);
+        return { ok: !why, msg: why, ghost: { kind: 'stack', x: item.x, z: item.z, level: item.kind === 'col' ? item.cups.length : 1, orient: tool },
+          act: function () { item.cups.push(tool); } };
+      }
+      var nc = { kind: 'col', x: hit.x, z: hit.z, cups: [tool] }, lonely = state.items.length && !hasNeighbour(nc, state.items);
+      return { ok: !lonely, msg: lonely ? LONELY : '', ghost: { kind: 'stack', x: hit.x, z: hit.z, level: 0, orient: tool },
+        act: function () { state.items.push({ kind: 'col', x: hit.x, z: hit.z, cups: [tool], straws: [] }); } };
+    }
+    if (tool === 'side') {
+      if (hit.idx !== undefined) return { ok: false, msg: '侧放杯只能放在桌面空位上' };
+      var ns = { kind: 'side', x: hit.x, z: hit.z, dir: dir.slice() }, lonely2 = state.items.length && !hasNeighbour(ns, state.items);
+      return { ok: !lonely2, msg: lonely2 ? LONELY : '', ghost: { kind: 'side', x: hit.x, z: hit.z, dir: dir.slice() },
+        act: function () { state.items.push({ kind: 'side', x: hit.x, z: hit.z, dir: dir.slice(), straws: [] }); } };
+    }
+    if (tool === 'straw') {
+      if (hit.idx === undefined) return { ok: false, msg: '点一只正放的杯来插吸管' };
+      var it3 = state.items[hit.idx];
+      if (it3.kind !== 'col') return { ok: false, msg: '侧放杯不插吸管', hover: hit.idx };
+      if (it3.kind === 'col' && it3.cups[it3.cups.length - 1] !== 'up') return { ok: false, msg: '最上层是倒扣杯，插不了吸管', hover: hit.idx };
+      var have = it3.straws || [];
+      if (have.length >= 2) return { ok: false, msg: '一只杯最多插两根吸管；要拔掉请用「拿走」或右键点这只杯', hover: hit.idx };
+      return { ok: true, hover: hit.idx, act: function () { it3.straws = have; var d = dir.slice();
+        it3.straws.push(stype === 'bent' ? { kind: 'bent', dir: d } : { kind: 'straight', dir: d, head: stype }); } };
+    }
+    if (tool === 'erase') {
+      if (hit.idx === undefined) return null;
+      var it4 = state.items[hit.idx];
+      var removesItem = !(it4.straws || []).length && !(it4.kind === 'col' && it4.cups.length > 1);
+      if (removesItem && isolated(state.items.filter(function (x) { return x !== it4; })).length)
+        return { ok: false, hover: hit.idx, msg: '拿走它会让旁边的杯落单，先挪开那只杯' };
+      var what = (it4.straws || []).length ? '已拔掉一根吸管' : (it4.kind === 'col' && it4.cups.length > 1 ? '已拿走最上层的杯' : '已拿走这只杯');
+      return { ok: true, hover: hit.idx, msg2: what, act: function () {
+        if ((it4.straws || []).length) { it4.straws.pop(); return; }
+        if (it4.kind === 'col' && it4.cups.length > 1) it4.cups.pop(); else state.items.splice(hit.idx, 1);
+      } };
+    }
+    return null;
+  }
+  function updateGhost() {
+    while (ghost.children.length) ghost.remove(ghost.children[0]);
+    var ev = lastHit ? evaluate(lastHit) : null;
+    var newHover = ev && ev.hover !== undefined ? ev.hover : -1;
+    if (newHover !== hoverIdx) { hoverIdx = newHover; buildInto(model, hoverIdx); }
+    if (!ev || !ev.ghost) return;
+    var mat = ev.ok ? M.ghost : M.ghostBad, g = ev.ghost;
+    if (g.kind === 'stack') placeUprightCup(ghost, g.orient, g.level, g.x * DIA, g.z * DIA, mat);
+    else { var sg = sideGroup(g.dir, mat); sg.position.set(g.x * DIA, 0, g.z * DIA); ghost.add(sg); }
+  }
+
+  var down = null;
+  renderer.domElement.addEventListener('pointerdown', function (e) { down = { x: e.clientX, y: e.clientY, t: performance.now() }; });
+  renderer.domElement.addEventListener('pointermove', function (e) {
+    if (e.pointerType === 'mouse' && e.buttons === 0) { lastHit = pick(e); updateGhost(); }
+  });
+  renderer.domElement.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  renderer.domElement.addEventListener('pointerleave', function () { lastHit = null; updateGhost(); });
+  renderer.domElement.addEventListener('pointerup', function (e) {
+    if (!down) return;
+    var moved = Math.hypot(e.clientX - down.x, e.clientY - down.y);
+    down = null;
+    if (moved > 6 || e.button === 1) return;
+    lastHit = pick(e);
+    var ev;
+    if (e.button === 2) { var keep = tool; tool = 'erase'; ev = evaluate(lastHit); tool = keep; if (!ev) return; }
+    else ev = evaluate(lastHit);
+    if (!ev) return;
+    if (!ev.ok) { toast(ev.msg); updateGhost(); return; }
+    pushUndo(); ev.act();
+    if (presetId !== 'custom') { presetId = 'custom'; }
+    if (ev.msg2) toast(ev.msg2);
+    hoverIdx = -2; afterChange(false); lastHit = pick(e); updateGhost();
+  });
+
+  function themeColors() {
+    var cs = getComputedStyle(document.documentElement);
+    scene.background = new THREE.Color(cs.getPropertyValue('--scene-bg').trim() || '#e3e7e7');
+    floorMat.color = new THREE.Color(cs.getPropertyValue('--floor').trim() || '#c9cfd0').multiplyScalar(0.74);
+    if (api) renderViews();
+  }
+  themeColors();
+  if (window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', themeColors);
+  new MutationObserver(themeColors).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+
+  function resize() { var w = stage.clientWidth, h = stage.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); }
+  new ResizeObserver(resize).observe(stage); resize();
+
+  (function loop() { controls.update(); renderer.render(scene, camera); requestAnimationFrame(loop); })();
+
+  api = { rebuild: rebuild, fit: fit, updateGhost: updateGhost, renderViews: renderViews };
+  rebuild(); fit();
+
+  // hook for exporting drafting views at higher resolution
+  window.__cupTool = {
+    load: function (id) { loadPreset(id, false); },
+    isolated: function () { return isolated(state.items).map(function (x) { return [x.kind, +x.x.toFixed(2), +x.z.toFixed(2)]; }); },
+    gaps: function () { return state.items.map(function (x) { var m = 9; state.items.forEach(function (y) { if (y !== x) m = Math.min(m, gap(x, y)); }); return +m.toFixed(2); }); },
+    setTint: function (on) { tint = on; document.getElementById('tint').checked = on; rebuild(); },
+    view: function (v, w, h) {
+      mini.setSize(w, h, false); grid.visible = false; ghost.visible = false;
+      if (v === 'iso') { var d = Math.max(ext * 3.4, 80); persp.position.set(center.x + d * 0.55, d * 0.6, center.z + d * 0.75); persp.lookAt(center.x, center.y * 0.7, center.z); persp.aspect = w / h; persp.updateProjectionMatrix(); mini.render(scene, persp); }
+      else { setOrtho(v); mini.render(scene, ortho); }
+      var url = mini.domElement.toDataURL('image/png');
+      mini.setSize(960, 720, false); grid.visible = true; ghost.visible = true; renderViews();
+      return url;
+    }
+  };
+})();
+</script>
+
+</html>
