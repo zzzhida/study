@@ -58,6 +58,17 @@ After editing `index.html`, regenerate the offline version with:
 python3 tools/build_offline.py   # writes dist/paper-cup-builder-offline.html
 ```
 
+## Printed contest cards
+
+[`print/contest_cards_A4.pdf`](print/contest_cards_A4.pdf) has the 12 groups on 12 A4 pages, one group per page. Each page holds the front, side and top views in three equal strips separated by dashed cut lines, so it cuts into three cards. The cups are plain white, all three views share one light gray background so the black straws stand out, and the three views of a group share one scale. Labels on the cards are in Chinese, for the class. Print at 100% / actual size.
+
+To regenerate after changing a structure (needs Node with Playwright, and Python with Pillow):
+
+```bash
+node tools/print_cards/render.js          # renders every view into tools/print_cards/out/
+python3 tools/print_cards/compose.py      # lays them out as tools/print_cards/out/contest_cards_A4.pdf
+```
+
 ## Controls
 
 | Action | How |
@@ -142,6 +153,8 @@ img/                    photos: g1–g6 are round 1, r2g1–r2g4 are round 2, ea
 design/                 view sheets for round 2, groups 5 and 6 (puzzle card + answer key)
 dist/                   single-file offline version
 tools/build_offline.py  script that builds the offline version
+tools/print_cards/      scripts that render and lay out the A4 contest cards
+print/                  the A4 contest cards (PDF)
 ```
 
 ## Credits
