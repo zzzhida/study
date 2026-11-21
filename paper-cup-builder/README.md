@@ -159,4 +159,4 @@ print/                  the A4 contest cards (PDF)
 
 ## Credits
 
-Activity design and photos by Group 7 of the psychology activity class. 3D modelling and the builder were made together with Claude.
+Activity design, photos, 3D modelling, and the builder by Group 7 of the psychology activity class.
