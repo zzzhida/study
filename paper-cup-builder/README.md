@@ -1,6 +1,6 @@
 # Paper Cup Builder
 
-A small 3D tool for building structures out of paper cups and straws and looking at their three orthographic views. It was made for a university psychology activity class, as the modelling and puzzle-making tool for Activity 2, “Seeing the Leopard Through a Tube” (from the Chinese idiom *guǎn zhōng kuī bào*: judging the whole from a glimpse).
+A small 3D tool for building structures out of paper cups and straws and looking at their three orthographic views. It was made for a university psychology activity class, as the modelling and puzzle-making tool for Activity 2, “Rebuilding the White Tower” (*chóng jiàn bái tǎ*).
 
 - Load the target structures from both rounds of the activity and compare the 3D model with the photographed front, side and top views.
 - Build new structures yourself; the panel on the right renders live front, side and top orthographic views that can be used directly as puzzle cards.
@@ -16,7 +16,7 @@ The class theme is “drop the labels, avoid one-sided views, look from many ang
 | Activity | Name | What it is about |
 |---|---|---|
 | 1 | Getting to Know Each Other | People: not labelling others |
-| 2 | Seeing the Leopard Through a Tube | Objects: rebuilding paper cups from three views |
+| 2 | Rebuilding the White Tower | Objects: rebuilding paper cups from three views |
 | 3 | Unravelling the Threads | Events: lateral-thinking “turtle soup” puzzles |
 
 How Activity 2 works: each team gets the three views of a paper-cup structure (front, side and top photos) and has to build the real cups to match.
